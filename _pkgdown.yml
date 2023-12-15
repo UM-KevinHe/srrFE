@@ -1,0 +1,28 @@
+url: https://github.com/UM-KevinHe/srrFE
+template:
+  params:
+    bootswatch: lumen
+    ganalytics: UA-54921687-5
+reference:
+- title: Function for Data Preparation Function
+  contents:
+  - fe_data_prep
+- title: Main Fitting Functions for Fixed Effects Models
+  desc: The main function for fitting the fixed effects model
+  contents:
+  - logis_fe
+- title: Function for Providing Standardized Ratios/Rates
+  desc: The main function for fitting the fixed effects model
+  contents:
+  - SR_output
+- title: Coefficient and Confidence Interval Functions
+  contents:
+  - coef.logis_fe
+  - confint.logis_fe
+- title: Hypothesis Testing Functions
+  contents:
+  - test_fe
+  - summary_fe_covar
+- title: Package Example Data Set
+  contents:
+  - data_FE

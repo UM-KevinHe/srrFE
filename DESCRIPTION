@@ -1,0 +1,36 @@
+Package: srrFE
+Type: Package
+Title: GLM Model with Provider as Fixed Effects
+Version: 1.0
+Date: 2023-12-14
+Author: Wenbo Wu, Yubo Shao, Kevin He
+Maintainer: Yubo Shao <ybshao@umich.edu>
+Description: If a fixed effect model is applied to data involving 
+   large-scale providers, the default glm function in R utilizes 
+   the Newton-Raphson and Fisher scoring methods for updating objective 
+   functions. Consequently, the computational burden of inverting the Fisher 
+   information matrix becomes significantly high. This software package serves 
+   as an implementation of the SerBIN method proposed by Wu et al. (2022) 
+   <doi:10.1002/sim.9387>, addressing and mitigating the computational 
+   challenges associated with such large-scale provider data.
+License: GPL (>= 3)
+LazyData: true
+Imports:
+    Rcpp, 
+    RcppParallel,
+    RcppArmadillo,
+    stats,
+    caret,
+    olsrr,
+    pROC,
+    poibin
+LinkingTo: Rcpp, RcppArmadillo, RcppParallel
+Depends:
+    R (>= 3.5.0)
+Suggests: 
+    knitr, rmarkdown
+VignetteBuilder: knitr
+RoxygenNote: 7.2.3
+URL: https://github.com/UM-KevinHe/srrFE
+Encoding: UTF-8
+SystemRequirements: GNU make

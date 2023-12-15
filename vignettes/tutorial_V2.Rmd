@@ -1,0 +1,381 @@
+---
+  title: "SRR fixed effect"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{SRR fixed effect}
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteEncoding{UTF-8}
+---
+  
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(ggplot2)
+
+Rcpp::sourceCpp('SRR_fixed_effect.cpp')
+source('SRR_fixed_effect.R')
+```
+
+## Introduction:
+
+In the upcoming section, we will use two simulated datasets to illustrate the fundamental utilization of the relevant functions within the SRR fixed effect model. 
+
+Both datasets are simulated by the `sim.fe.prov()` function contained in the current package, which include information of:
+  
+  * 10 facilities
+
+  * 4 continuous variables 
+
+  * 1 binary outcome
+
+```{r}
+set.seed(1)
+m <- 10 #number of facilities
+prov.size <- rep(50, 10) #each facility has 50 records
+gamma <- round(rnorm(m, 0, 1), 3) #facility effects follow N(0, 1)
+beta <- c(-2, -1, 0.5, 3)
+Y.char <- "Y"
+Z.char <- c("Z1", "Z2", "Z3", "Z4")
+prov.char <- "Prov.ID"
+data_normal <- sim.fe.prov(m, prov.size, gamma, beta, Y.char, Z.char, prov.char, rho = 0.2, method = "KW2013")
+head(data_normal)
+```
+
+The second dataset includes facilities that are outliers, meaning that certain facilities either have no readmissions or have all their readmissions occurring after discharge.
+
+```{r}
+gamma[1:2] <- c(-10, 10) #the first two facilities are "outliers"
+data_outlier <- sim.fe.prov(m, prov.size, gamma, beta, Y.char, Z.char, prov.char, rho = 0.2, method = "KW2013")
+head(data_outlier)
+```
+
+## Data Preparation Function
+
+We will start by using the `fe.data.prep()` function to prepare the necessary data structure for our function. The original data is processed in the following sequence:
+  
+  * checking absence of response variable, covariates, facility and hospital identifiers
+
+* checking missing values in these variables,
+
+* facility screening based on number of discharges, 10 as default,
+
+* calculating the total number of facilities and hospitals,
+
+* reporting proportions of facilities with no readmission within 30 days, and with all readmissions within 30 days after discharge,
+
+* modifying responses to prevent infinite log-likelihoods during model fitting, and
+
+* sorting data by hospital and facility identifiers.
+
+
+This function will return a data frame sorted by provider IDs with additional variables 'included', 'no.readm', 'all.readm' and missing values imputed.
+
+```{r}
+data_normal <- fe.data.prep(data_normal, Y.char, Z.char, prov.char)
+head(data_normal)
+```
+
+```{r}
+data_outlier <- fe.data.prep(data_outlier, Y.char, Z.char, prov.char)
+head(data_outlier)
+```
+
+##  Estimation Function
+
+### Coefficients Estimation
+
+The `logis.BIN.fe.prov()` is the parameter estimation function, which performs the SerBIN method as introduced by Wu et al. (2022). 
+
+The algorithm is based on Newton-Raphson. Shortly, for a binary outcome, the likelihood function can be expressed as:
+  $$l(\gamma, \beta) = \sum_{i = 1}^m \sum_{j = 1}^{n_i}\{Y_{ij} \cdot (\gamma_i + X_{ij}\beta) - log(1 + e^{\gamma_i + X_{ij}\beta})\},$$ and the corresponding score function can be expressed as: $$U(\gamma_i) = \sum_{j = 1}^{n_i} \{Y_{ij} - \frac{e^{\gamma_i + X_{ij}\beta}}{1 + e^{\gamma_i + X_{ij}\beta}}\}$$ $$U(\beta_p) = \sum_{i = 1}^m \sum_{j = 1}^{n_i} \{X_{ijp} \cdot (Y_{ij} - \frac{e^{\gamma_i + X_{ij}\beta}}{1 + e^{\gamma_i + X_{ij}\beta}})\}.$$ 
+  The information matrix can be seen as a $2 \times 2$ block matrix with $$ I(\gamma, \beta) = \begin{pmatrix} I(\gamma) & I(\gamma, \beta)   \\   I(\beta, \gamma) & I(\beta)  \end{pmatrix} \equiv \begin{pmatrix} I_{11} & I_{12} \\ I_{21} & I_{22}  \end{pmatrix}.$$ Notice that $I(\gamma)$ block is "large" but diagonal, therefore we can calculate $I^{-1}(\gamma, \beta)$ by: $$I^{-1}(\gamma, \beta) = \begin{pmatrix} I_{11}^{-1} + {J_1}^{T} S^{-1} J_1 & - {J_2}^{T}   \\   - {J_2} &  S^{-1}  \end{pmatrix},$$ where $J_1 = I_{21}{I_{11}}^{-1}$, $S = I_{22} - J_1 I_{12}$, and $J_2 = S^{-1}J_1$.
+
+The bottleneck of SerBIN is computing $I_{22}$ (i.e. $I(\beta)$) when sample size $n$ is extraordinarily large, but in fact each element of $I_{22}$ can be computed separately, such that parallel computing can be used to boost computational efficiency:
+  
+  $$I(\beta)_{r,c} = <X^{(r)}, X^{(c)} \circ \mathbb{I}>,$$ where $<a, b>$ denotes the inner product of $a$ and $b$ (i.e. $a^T b$), $\circ$ is the Hadamard product (element-wise product), and $\mathbb{I} = p(1-p)$. Note that $I(\beta)$ is symmetric, so we only need to calculate the upper triangular entries.
+
+```{r}
+fit.SerBIN.indirect <- logis.BIN.fe.prov(data_normal, Y.char, Z.char, prov.char, 
+                                         SRR = "indirect", rate = T)
+fit.SerBIN.indirect$beta
+fit.SerBIN.indirect$df.prov$gamma
+```
+
+Outlier facilities will have their facility effects labeled as either "Inf" or "-Inf". 
+
+```{r}
+fit.SerBIN.direct <- logis.BIN.fe.prov(data_outlier, Y.char, Z.char, prov.char, 
+                                       SRR = "direct", rate = T)
+fit.SerBIN.direct$beta
+fit.SerBIN.direct$df.prov$gamma
+```
+
+In fact, to prevent the gamma estimate from exploding (or unstable) in our code, we constrain the ${\hat{\gamma}}^{[l]}$ within a specific range during each iteration. By default, this range is ${\hat{\gamma}_{med}}^{[l-1]} \pm 10$. As a result, the final $\hat{\gamma}$ estimate of outlying facility will not truly be $\pm \infty$. We modify them manually.
+
+### Standardized readmission ratio (SRR)
+
+In addition to the covariate coefficients and the facility effects outputs, users can specify the method ("direct" or "indirect" standardization) for computing facility-level SRR, where
+
+* **"Indirect standardization ratio"** is calculated by
+
+$$SRR_i = \frac{O_i}{E_i},$$ where $O_i$ is the observed number of readmission for facility $i$ (i.e. $O_i = \sum_{j = 1}^{n_i} Y_{ij}$), and $E_i$ is the expected number of readmission for facility $i$ that is calculated by $E_i = \sum_{j = 1}^{n_i} \frac{e^{\gamma_0 + X_{ij}\beta}}{1 + e^{\gamma_0 + X_{ij}\beta}}$. $\gamma_0$ is the "national norm", and in default, it is set to be the median value of all $\hat{\gamma}_i$'s. $SRR_i >1$ indicates that the facility $i$ has a rate of readmission higher than would be expected based on patient characteristics and the national norm.
+
+```{r}
+fit.SerBIN.indirect$df.prov[, 1:3]
+```
+
+* **"Direct standardization ratio"** is calculated by
+
+$$\hat{SRR}^{(k)} = \frac{E^{(k)}}{O},$$ where $O = \sum_{i = 1}^m O_i$, and $E^{(k)} = \sum_{i = 1}^m \sum_{j = 1}^{n_i} \frac{e^{\hat{\gamma}_k + X_{ij}\beta}}{1 + e^{\hat{\gamma}_k + X_{ij}\beta}}$. Note: (1) the "hat" symbol in $\hat{SRR}^{(k)}$ comes from $\hat{\gamma}_k$, which is the estimated value of $\gamma_k$. (2) When $\hat{\gamma}_k = \infty$, $E^{(k)} = N$ such that $\hat{SRR}^{(k)} = \frac{N}{O}$; and when $\hat{\gamma}_k = -\infty$, $E^{(k)} = 0$ such that $\hat{SRR}^{(k)} = 0$. 
+
+```{r}
+fit.SerBIN.direct$df.prov[, 1:3]
+```
+
+Users also have the option to request the function to provide a "standardization rate", which is computed as $SRR \times \frac{O}{N}$. Note that the "indirect rate" has been manually restricted to $0\% - 100\%$.
+
+```{r}
+fit.SerBIN.indirect$df.prov[, 1:4]
+
+fit.SerBIN.direct$df.prov[, 1:4]
+```
+
+##  Hypothesis Testing Function
+
+The `test.fe.prov()` function provides hypothesis testing outcomes to assist users in identifying outlier providers with extreme outcomes. By default, we utilize the median of all estimated facility effects as the null value (i.e. $H_0: \gamma_i = \hat{\gamma}_{med}$). Users have the flexibility to select from various testing methods, including "exact.poisbinom" (default), "exact.binom", "exact.bootstrap", "score", and "wald".
+
+* **"exact.poisbinom"**: Suppose $Y_{ij}|X_{ij} \sim Bernoulli(p_{ij})$. Since within the facility $i$, $p_{ij} = \frac{e^{\gamma_i + X_{ij}\beta}}{1 + e^{\gamma_i + X_{ij}\beta}}$'s are different, then $O_i | X_i = \sum_{j = 1}^{n_i}Y_{ij}$ will follow the Poisson-binomial distribution. Then we calculate the probability of "getting a more extreme number of $O_i$, if $H_0$ is true" based on the Poisson-binomial distribution.
+
+* **"exact.binom"**: Find $p_{ij}$'s first, then compute $\bar{p_i} = \frac{\sum_{j = 1}^{n_i} p_{ij}}{n_i}$. Assume $O_i | X_i \sim Binomial(n_i, \bar{p_i})$ and perform the exact test as above.  
+
+*[Source code]*
+```{r eval=FALSE}
+exact.binom <- function(df) {
+  probs <- plogis(gamma.null + unname(as.matrix(df[, Z.char])) %*% beta)
+  obs <- sum(df[,Y.char])
+  p <- 1 - pbinom(obs, size=length(probs), prob=mean(probs)) + 
+    0.5*dbinom(obs, size=length(probs), prob=mean(probs))
+  z.score <- qnorm(p, lower=F)
+  flag <- ifelse(p<alpha/2, 1, ifelse(p<=1-alpha/2, 0, -1))
+  p.val <- 2 * min(p, 1-p)
+  return(c(flag, p.val, z.score))
+  }
+```
+
+* **"exact.bootstrap"**: (1)Repeat $b =$ 10,000 times (default): Simulate ${Y_{ij}}^{(b)} \sim Bernoulli(\frac{e^{\gamma_0 + X_{ij}\beta}}{1 + e^{\gamma_0 + X_{ij}\beta}})$ and ${Y_{i}}^{(b)} = \sum_{j = 1}^{n_i} {Y_{ij}}^{(b)}$. (2) Calculate the frequency that ${Y_{i}}^{(b)}$ is more extreme than $O_i$. (3) calculate $p-$value. (Note: "Exact Bootstrap" is consistent to "Exact Poisbinom")
+
+* **"wald"**: If $H_0: \gamma_i = \gamma_0$ is true, $\frac{\hat{\gamma}_i - \gamma_0}{se(\hat{\gamma}_i)} \sim N(0, 1)$. The $se(\hat{\gamma}_i)$ can be calculated by above $I_{11}^{-1} + {J_1}^{T} S^{-1} J_1$ but with only diagonal elements. 
+
+Note that the "Wald test" is not valid for outlying facilities (i.e. $\hat{\gamma}_i = \pm \infty$). "Error message" is added in the code to inform users.
+
+*[Source code]*
+```{r eval=FALSE}
+if (sum(!is.finite(gamma)) != 0) {
+  stop("wald test cannot be performed on facilities with zero or all readmissions!!")
+}
+```
+
+* **"score"**: Problematic. In a standard score test procedure, the initial step involves computing the "restricted MLE" of $\hat{\beta}^*$. Then calculate $U(\gamma_i)|_{\gamma_i = \gamma_0} = \sum_{j = 1}^{n_i} \{Y_{ij} - \frac{e^{\gamma_0 + X_{ij}\hat{\beta}^*}}{1 + e^{\gamma_0 + X_{ij}\hat{\beta}^*}}\}$, and $I(\gamma_i)|_{\gamma_i = \gamma_0} = \sum_{j = 1}^{n_i} \{\frac{e^{\gamma_0 + X_{ij}\hat{\beta}^*}}{(1 + e^{\gamma_0 + X_{ij}\hat{\beta}^*})^2}\}$. Since estimation of ${\beta}$'s are affected by the estimation pf $\gamma$'s, generally $\hat{\beta}^* \neq \hat{\beta}$. 
+
+However, the original code doesn't refit the models, but directly use $\hat{\beta}$. On the other hand, if we refit the models, because we have thousands of facilities to be tested, it's impossible to refit thousands of new models. 
+
+*[Source code]*
+```{r eval=FALSE}
+probs <- plogis(gamma.null + unname(as.matrix(data[, Z.char])) %*% beta)
+z.score <- sapply(split(data[, Y.char] - probs, data[, prov.char]), sum) /
+  sqrt(sapply(split(probs * (1 - probs), data[, prov.char]), sum))
+p <- pnorm(z.score, lower = F)
+flag <- ifelse(p < alpha / 2, 1, ifelse(p <= 1 - alpha / 2, 0,-1))
+p.val <- 2 * pmin(p, 1 - p)
+```
+
+Here are examples for "testing" code. The "flag" column contains values of -1, 0, and 1, which respectively indicate facilities performing worse, the same as, or better than the national average. The "p" and "stat" columns in the data frame correspond to the p-value and Z-score of the test statistic, respectively. 
+
+We can see that the testing results are almost the same.  
+
+```{r}
+test.exact.poisbinom <- test.fe.prov(data_normal, fit.SerBIN.indirect, Y.char, Z.char, prov.char, test = "exact.poisbinom")
+test.exact.poisbinom
+```
+
+```{r}
+test.wald <- test.fe.prov(data_normal, fit.SerBIN.indirect, Y.char, Z.char, prov.char, test = "wald")
+test.wald
+```
+```{r}
+test.exact.bootstrap <- test.fe.prov(data_normal, fit.SerBIN.indirect, Y.char, Z.char, prov.char, test = "exact.bootstrap")
+test.exact.bootstrap
+```
+Even the "problematic" score test also provides a similar result:
+```{r}
+test.exact.score <- test.fe.prov(data_normal, fit.SerBIN.indirect, Y.char, Z.char, prov.char, test = "score")
+test.exact.score
+```
+
+##  Confidence Interval Function
+
+The `confint.fe.prov()` function provides the confidence intervals for the SRRs and facility effects for each facilities selected to be tested. users can choose the method for generating confidence intervals from the following options:
+
+* **"exact"**: Based on the Poisson binomial distribution of $O_i|X_i$, find the range of $\gamma_0$ such that $P_{exact} \geq 0.05$. 
+
+*[Source code]*
+```{r eval=FALSE}
+CL.finite <- function(df) {
+  UL.gamma <- function(Gamma)
+    poibin::ppoibin(Obs - 1, plogis(Gamma + Z.beta)) + 
+    0.5 * poibin::dpoibin(Obs, plogis(Gamma + Z.beta)) - alpha / 2
+  LL.gamma <- function(Gamma)
+    1 - poibin::ppoibin(Obs, plogis(Gamma + Z.beta)) + 
+    0.5 * poibin::dpoibin(Obs, plogis(Gamma + Z.beta)) - alpha / 2
+  prov <- ifelse(length(unique(df[, prov.char])) == 1, unique(df[, prov.char]),
+                 stop("Number of providers involved NOT equal to one!"))
+  Z.beta <- as.matrix(df[, Z.char]) %*% beta
+  gamma.lower <- uniroot(LL.gamma, gamma[prov] + c(-5, 0))$root
+  gamma.upper <- uniroot(UL.gamma, gamma[prov] + c(0, 5))$root
+}
+```
+
+It's important to note that we must numerically find the endpoints of the confidence interval, which involves locating the roots of an equation. However, we should be careful as this range can depend on the data. In some instances, searching within $\hat{\gamma}_i \pm 5$ (default) may not be sufficient! (e.g. when $\hat{\gamma}_i$ is large but not $\pm \infty$)
+
+The diagram below illustrates the root search process. The point where the blue line intersects with the line $y = 0$ represents the root, while the shaded green region indicates the search range.
+
+```{r fig1, fig.height = 5, fig.width = 8, fig.align = "center", echo=FALSE}
+alpha <- 0.05
+data <- data_normal[data_normal$included==1, ]
+df.prov <- fit.SerBIN.indirect$df.prov
+gamma <- df.prov$gamma
+names(gamma) <- rownames(df.prov)
+beta <- fit.SerBIN.indirect$beta
+df <- by(data[(data$no.readm==0) & (data$all.readm==0),], data[(data$no.readm==0) & (data$all.readm==0),prov.char],identity)$`1`
+UL.gamma <- function(Gamma)
+  poibin::ppoibin(Obs - 1, plogis(Gamma + Z.beta)) + 
+  0.5 * poibin::dpoibin(Obs, plogis(Gamma + Z.beta))
+prov <- ifelse(length(unique(df[, prov.char])) == 1, unique(df[, prov.char]),
+               stop("Number of providers involved NOT equal to one!"))
+Z.beta <- as.matrix(df[, Z.char]) %*% beta
+Obs <- df.prov[prov, "Obs"]; 
+x <- seq(gamma[prov] - 7, gamma[prov] + 7, 0.02)
+y.u <- rep(0, length(x))
+for (i in 1:length(x)){
+  y.u[i] <- UL.gamma(x[i])
+}
+
+plot.df <- as.data.frame(cbind(x, y.u))
+
+plot <- ggplot(plot.df) +
+  geom_line(aes(x, y.u), size = 0.5, color = "blue") +
+  geom_hline(color = "red", linetype = 2, size = 0.5, alpha = 0.6, yintercept = alpha / 2) +
+  geom_rect(aes(xmin = gamma[prov], xmax = gamma[prov] + 5), alpha=0.003, fill="green", ymin = -Inf, ymax = Inf) +
+  theme(
+    panel.grid = element_blank(),
+    panel.background = element_blank(),
+    axis.line = element_line(colour = "black")
+  ) +
+  theme(
+    axis.title = element_text(size = 16, family = "serif"),
+    axis.text = element_text(size = 14, family = "serif"),
+    axis.text.x = element_text(vjust = 0.5)
+  ) +
+  theme(plot.title = element_text(
+    size = 18,
+    family = "serif",
+    face = "bold.italic"
+  )) + 
+  labs(title = "Upper Bound of CI (Exact Test)",
+       x = expression(gamma[0]), 
+       y = "Probability")
+
+plot
+```
+
+
+* **"wald"**: Directly convert $\hat{\gamma}_i \pm 1.96 \times se(\hat{\gamma}_i)$, which is invalid for outlying facilities. 
+
+* **"score"**: Find the range of $\gamma_0$ such that $\frac{U(\gamma_i)|_{\gamma_i = \gamma_0}}{\sqrt{I(\gamma_i)|_{\gamma_i = \gamma_0}}} \in (-1.96, 1.96)$. The problem for score test still exist (even more serious). 
+
+```{r fig2, fig.height = 5, fig.width = 8, fig.align = "center", echo=FALSE}
+qnorm.halfalpha <- qnorm(alpha/2, lower=F)
+search.score <- function(Gamma) {
+  p <- plogis(Gamma + Z.beta)
+  return((Obs - sum(p)) / sqrt(sum(p * (1 - p))))
+}
+LL.gamma <- function(Gamma) {
+  p <- plogis(Gamma + Z.beta)
+  return((Obs - sum(p)) / sqrt(sum(p * (1 - p))) - qnorm.halfalpha)
+}
+x <- seq(gamma[prov] - 5, gamma[prov] + 5, 0.02)
+y <- rep(0, length(x))
+for (i in 1:length(x)){
+  y[i] <- search.score(x[i])
+}
+
+plot.df <- as.data.frame(cbind(x, y))
+
+plot2 <- ggplot(plot.df) +
+  geom_line(aes(x, y), size = 0.5, color = "blue") +
+  geom_hline(color = "red", linetype = 2, size = 0.5, alpha = 0.6, 
+             yintercept = c(-qnorm.halfalpha, qnorm.halfalpha)) +
+  geom_rect(aes(xmin = gamma[prov], xmax = gamma[prov] + 5), alpha=0.003, 
+            fill="green", ymin = -Inf, ymax = Inf) +
+  geom_rect(aes(xmin = gamma[prov] - 5, xmax = gamma[prov]), alpha=0.002, 
+            fill="yellow", ymin = -Inf, ymax = Inf) +
+  theme(
+    panel.grid = element_blank(),
+    panel.background = element_blank(),
+    axis.line = element_line(colour = "black")
+  ) +
+  theme(
+    axis.title = element_text(size = 16, family = "serif"),
+    axis.text = element_text(size = 14, family = "serif"),
+    axis.text.x = element_text(vjust = 0.5)
+  ) +
+  theme(plot.title = element_text(
+    size = 18,
+    family = "serif",
+    face = "bold.italic"
+  )) + 
+  labs(title = "Upper Bound of CI (Score Test)",
+       x = expression(gamma[0]), 
+       y = "Z score")
+
+plot2
+```
+
+This is the confidence interval provided using the exact test:
+  
+  ```{r}
+confint.exact <- confint.fe.prov(data_normal, fit.SerBIN.indirect, Y.char, Z.char, prov.char, test="exact", alpha = 0.05)
+confint.exact[, 1:2]
+```
+
+We can also calculate the confidence interval for SRR based on the confidence interval for $\gamma_i$. In the context of indirect standardization, the interpretation of the confidence interval for SRR is as follows: If $SRR_i = 1$ holds true, then $(1 - \alpha)\%$ of the confidence intervals will cover the value 1.
+
+Since the score equation tells us $O_i = \sum_{j = 1}^{n_i} \frac{e^{\hat{\gamma}_i + X_{ij}\hat{\beta}}}{1 + e^{\hat{\gamma}_i + X_{ij}\hat{\beta}}}$, the CI of SRR can be calculated as: $$(\sum_{j = 1}^{n_i} \frac{e^{\gamma_{i,L} + X_{ij}\hat{\beta}}}{1 + e^{\gamma_{i,L} + X_{ij}\hat{\beta}}}, \sum_{j = 1}^{n_i} \frac{e^{\gamma_{i,U} + X_{ij}\hat{\beta}}}{1 + e^{\gamma_{i,U} + X_{ij}\hat{\beta}}}).$$ This formula holds since $\gamma_{i, CI}$ covers $\gamma_0$ if and only if $SRR_{i, CI}$ covers $1$.
+
+```{r}
+confint.exact[, 3:4]
+```
+
+For direct standardization, the interpretation of the confidence interval for SRR is: If $\gamma_k = \gamma_0$ is true, then $(1 - \alpha)\%$ of the confidence intervals of $SRR^{(k)}$ will cover $SRR^{(0)}$, where 
+
+$$SRR^{(0)} = \frac{\sum_{i = 1}^m \sum_{j = 1}^{n_i} \frac{e^{{\gamma}_0 + X_{ij}\beta}}{1 + e^{{\gamma}_0 + X_{ij}\beta}}}{\sum_{i = 1}^m O_i}.$$
+  
+  We claim that $${SRR^{(k)}}_{CI} = (\frac{\sum_{i = 1}^m \sum_{j = 1}^{n_i} \frac{e^{\gamma_{k,L} + X_{ij}\beta}}{1 + e^{\gamma_{k,L} + X_{ij}\beta}}}{\sum_{i = 1}^m O_i}, \frac{\sum_{i = 1}^m \sum_{j = 1}^{n_i} \frac{e^{\gamma_{k,U} + X_{ij}\beta}}{1 + e^{\gamma_{k,U} + X_{ij}\beta}}}{\sum_{i = 1}^m O_i}).$$ This CI formula is valid since $\gamma_{k, CI}$ covers $\gamma_0$ if and only if ${SRR^{(k)}}_{CI}$ covers $SRR^{(0)}$.  
+
+##  Testing Function for Covariate Coefficients
+
+Additionally, we offer the `summary.fe.covar` function, which provides estimation and test statistics for the covariate coefficients. The test statistics can be calculated by the "wald test", "score test", or "likelihood ratio test". Please note that in this function, the score test involves refitting the restricted model.
+
+```{r}
+summary.wald <- summary.fe.covar(data_normal, fit.SerBIN.indirect, Y.char, Z.char, prov.char, test="wald", alpha = 0.05)
+summary.wald
+```
+
+Score test doesn't provide the confidence interval, might because it's too tedious to find the root based on numerical computing.
+
+```{r}
+summary.score <- summary.fe.covar(data_normal, fit.SerBIN.indirect, Y.char, Z.char, prov.char, test="score", alpha = 0.05)
+summary.score
+```

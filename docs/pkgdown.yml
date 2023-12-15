@@ -1,0 +1,11 @@
+pandoc: 2.7.2
+pkgdown: 2.0.7
+pkgdown_sha: ~
+articles:
+  FE_tutorial: FE_tutorial.html
+  SRR: SRR.html
+last_built: 2023-12-14T20:15Z
+urls:
+  reference: https://gitlab.kecc.sph.umich.edu/reference
+  article: https://gitlab.kecc.sph.umich.edu/articles
+
