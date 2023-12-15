@@ -1,48 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://gitlab.kecc.sph.umich.edu/404.html</loc>
+    <loc>https://github.com/UM-KevinHe/srrFE/404.html</loc>
   </url>
   <url>
-    <loc>https://gitlab.kecc.sph.umich.edu/articles/FE_tutorial.html</loc>
+    <loc>https://github.com/UM-KevinHe/srrFE/articles/FE_tutorial.html</loc>
   </url>
   <url>
-    <loc>https://gitlab.kecc.sph.umich.edu/articles/index.html</loc>
+    <loc>https://github.com/UM-KevinHe/srrFE/articles/index.html</loc>
   </url>
   <url>
-    <loc>https://gitlab.kecc.sph.umich.edu/articles/SRR.html</loc>
+    <loc>https://github.com/UM-KevinHe/srrFE/articles/Models.html</loc>
   </url>
   <url>
-    <loc>https://gitlab.kecc.sph.umich.edu/authors.html</loc>
+    <loc>https://github.com/UM-KevinHe/srrFE/articles/Quick-start.html</loc>
   </url>
   <url>
-    <loc>https://gitlab.kecc.sph.umich.edu/index.html</loc>
+    <loc>https://github.com/UM-KevinHe/srrFE/articles/SRR.html</loc>
   </url>
   <url>
-    <loc>https://gitlab.kecc.sph.umich.edu/reference/coef.logis_fe.html</loc>
+    <loc>https://github.com/UM-KevinHe/srrFE/articles/srrFE.html</loc>
   </url>
   <url>
-    <loc>https://gitlab.kecc.sph.umich.edu/reference/confint.logis_fe.html</loc>
+    <loc>https://github.com/UM-KevinHe/srrFE/authors.html</loc>
   </url>
   <url>
-    <loc>https://gitlab.kecc.sph.umich.edu/reference/data_FE.html</loc>
+    <loc>https://github.com/UM-KevinHe/srrFE/index.html</loc>
   </url>
   <url>
-    <loc>https://gitlab.kecc.sph.umich.edu/reference/fe_data_prep.html</loc>
+    <loc>https://github.com/UM-KevinHe/srrFE/reference/coef.logis_fe.html</loc>
   </url>
   <url>
-    <loc>https://gitlab.kecc.sph.umich.edu/reference/index.html</loc>
+    <loc>https://github.com/UM-KevinHe/srrFE/reference/confint.logis_fe.html</loc>
   </url>
   <url>
-    <loc>https://gitlab.kecc.sph.umich.edu/reference/logis_fe.html</loc>
+    <loc>https://github.com/UM-KevinHe/srrFE/reference/data_FE.html</loc>
   </url>
   <url>
-    <loc>https://gitlab.kecc.sph.umich.edu/reference/SR_output.html</loc>
+    <loc>https://github.com/UM-KevinHe/srrFE/reference/fe_data_prep.html</loc>
   </url>
   <url>
-    <loc>https://gitlab.kecc.sph.umich.edu/reference/summary_fe_covar.html</loc>
+    <loc>https://github.com/UM-KevinHe/srrFE/reference/index.html</loc>
   </url>
   <url>
-    <loc>https://gitlab.kecc.sph.umich.edu/reference/test_fe.html</loc>
+    <loc>https://github.com/UM-KevinHe/srrFE/reference/logis_fe.html</loc>
+  </url>
+  <url>
+    <loc>https://github.com/UM-KevinHe/srrFE/reference/SR_output.html</loc>
+  </url>
+  <url>
+    <loc>https://github.com/UM-KevinHe/srrFE/reference/summary_fe_covar.html</loc>
+  </url>
+  <url>
+    <loc>https://github.com/UM-KevinHe/srrFE/reference/test_fe.html</loc>
   </url>
 </urlset>

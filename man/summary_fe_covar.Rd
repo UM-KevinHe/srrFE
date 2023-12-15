@@ -32,7 +32,7 @@ Provide the Summary Statistics for Covariate Estimates
 \examples{
 data(data_FE)
 data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID)
-fit_fe <- logis_fe(data.prep, message = T)
+fit_fe <- logis_fe(data.prep)
 summary.wald.cpp <- summary_fe_covar(fit_fe, level = 0.05, test = "wald")
 summary.wald.cpp
 
