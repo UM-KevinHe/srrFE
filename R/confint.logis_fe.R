@@ -230,7 +230,7 @@ confint.logis_fe <- function(fit, parm, level = 0.95, test = "exact",
       } else {
         stop("Argument 'parm' includes invalid elements!")
       }
-      #funcitons for calculate CI of SRs
+      #functions for calculate CI of SRs
       qnorm.halfalpha <- qnorm(alpha/2, lower=F)
       qnorm.alpha <- qnorm(alpha, lower=F)
       SR_indirect.finite <- function(df) {

@@ -231,7 +231,7 @@ body {
 <div class="section level3">
 <h3 id="hypothesis-testing-for-facility-effects">Hypothesis Testing for Facility Effects<a class="anchor" aria-label="anchor" href="#hypothesis-testing-for-facility-effects"></a>
 </h3>
-<p>The <code><a href="../reference/test_fe.html">test_fe()</a></code> function provides hypothesis testing outcomes to assist users in identifying outlier facilities with extreme outcomes. By default, we utilize the median of all estimated facility effects as the null value (i.e. <span class="math inline">\(H_0: \gamma_i = \hat{\gamma}_{med}\)</span>). Users have the flexibility to select from various testing methods, including “exact.poisbinom” (default), “exact.binom”, “exact.bootstrap”, “score”, and “wald”.</p>
+<p>The <code><a href="../reference/test_fe.html">test_fe()</a></code> function provides hypothesis testing outcomes to assist users in identifying outlier facilities with extreme outcomes.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">test_poisbinom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/test_fe.html">test_fe</a></span><span class="op">(</span><span class="va">fit_fe</span><span class="op">)</span></span>
 <span><span class="va">test_poisbinom</span></span>

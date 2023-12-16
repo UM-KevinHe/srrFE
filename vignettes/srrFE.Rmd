@@ -98,7 +98,7 @@ SR$indirect.ratio
 
 ### Hypothesis Testing for Facility Effects
 
-The `test_fe()` function provides hypothesis testing outcomes to assist users in identifying outlier facilities with extreme outcomes. By default, we utilize the median of all estimated facility effects as the null value (i.e. $H_0: \gamma_i = \hat{\gamma}_{med}$). Users have the flexibility to select from various testing methods, including "exact.poisbinom" (default), "exact.binom", "exact.bootstrap", "score", and "wald". 
+The `test_fe()` function provides hypothesis testing outcomes to assist users in identifying outlier facilities with extreme outcomes.
 
 ```{r}
 test_poisbinom <- test_fe(fit_fe)

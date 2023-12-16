@@ -103,7 +103,7 @@ test_fe <- function(fit, parm, level = 0.95, test = "exact.poisbinom", null = "m
                       stat=results[3,],
                       row.names=unique(data[, prov.char])))
   } else if (test=="score") {
-    probs <- plogis(gamma.null+unname(as.matrix(data[,Z.char]))%*%beta) #this might be problematic. Here we need to plug in restricted MLE of beta. Since the estimate on beta depends on gamma, the two sets of beta might be different.
+    probs <- plogis(gamma.null+unname(as.matrix(data[,Z.char]))%*%beta)
     z.score <- sapply(split(data[,Y.char]-probs,data[,prov.char]),sum) /
       sqrt(sapply(split(probs*(1-probs),data[,prov.char]),sum))
     p <- pnorm(z.score, lower=F)
