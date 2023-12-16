@@ -1,6 +1,6 @@
 # srrFE
 
-The `srrFE` software package is designed to implement the SerBIN method proposed by Wu et al. (2022) (doi:10.1002/sim.9387), specifically tailored to address the computational challenges inherent in large-scale provider data.  Additionally, the package is equipped with functions designed to estimate standardized ratios and rates and conduct hypothesis testing.
+The `srrFE` software package is designed to implement the SerBIN method proposed by [Wu et al. (2022)](doi:10.1002/sim.9387), specifically tailored to address the computational challenges inherent in large-scale provider data.  Additionally, the package is equipped with functions designed to estimate standardized ratios and rates and conduct hypothesis testing.
 
 ## Introduction
 
