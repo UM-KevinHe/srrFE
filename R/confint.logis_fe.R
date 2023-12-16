@@ -1,52 +1,60 @@
 #=== CONFIDENCE INTERVAL FUNCTION =================================
 #' Provide Confidence Interval for Provider effects or Standardization Ratios/Rates
 #'
-#' @param fit an object as output of \code{logis_fe} function
-#' 
-#' @param parm specify a subset of which providers are to be given confidence intervals.
-#' 
-#' @param level confidence level used for constructing confidence intervals. Defaulting to 0.95
-#' 
-#' @param option the confidence interval for the function's output, whether it is for gamma or standardization ratios/rates
-#'   * `gamma`: provider effect
-#'   * `SR`: standardization ratios/rates
-#' 
-#' @param test a character string specifying the type of testing method, defaulting to "exact"
-#'   * `exact`: exact test
-#'   * `wald`: wald test
-#'   * `score`: score test
+#' @param fit an object as output of \code{logis_fe} function.
+#'
+#' @param parm specify a subset of which providers are to be given confidence intervals. All providers are included by default.
+#'
+#' @param level confidence level used for constructing confidence intervals. Defaulting to 0.95.
+#'
+#' @param option the confidence interval for the function's output, whether it is for gamma or standardization ratios/rates.
+#'   \itemize{
+#'   \item "gamma": provider effect
+#'   \item "SR": standardization ratios/rates
+#'   }
+#'
+#' @param test a character string specifying the type of testing method. Defaulting to "exact".
+#'   \itemize{
+#'   \item "exact": exact test
+#'   \item "wald": wald test
+#'   \item "score": score test
+#'   }
 #'
 #' @param stdz if option = 'SR', a character string specifying the standardization method. Defaulting to "indirect".
-#'   * `indirect`: using indirect standardized method
-#'   * `direct`: using direct standardized method
-#' 
+#'   \itemize{
+#'   \item "indirect": using indirect standardized method
+#'   \item "direct": using direct standardized method
+#'   }
+#'
 #' @param measure if option = 'SR', a boolean indicating whether the output measure is "ratio" or "rate". Both "rate" and "ratio" will be provided by default.
-#'   * `rate`: output the standardized rate. The "rate" has been restricted to 0% - 100%.
-#'   * `ratio`:  output the standardized ratio
-#' 
+#'   \itemize{
+#'   \item "rate": output the standardized rate. The "rate" has been restricted to 0% - 100%.
+#'   \item "ratio":  output the standardized ratio
+#'   }
+#'
 #' @param ...
-#' 
-#' @return A dataframe containing the point estimate, and lower and upper bounds of the estimate. 
-#' 
+#'
+#' @return A dataframe containing the point estimate, and lower and upper bounds of the estimate.
+#'
 #' @examples
 #' data(data_FE)
-#' data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID)
+#' data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID, message = FALSE)
 #' fit_fe <- logis_fe(data.prep)
 #' confint(fit_fe, option = "gamma")
 #' confint(fit_fe, option = "SR", stdz = "direct", measure = "rate")
-#' 
+#'
 #' @importFrom stats plogis
-#' 
+#'
 #' @exportS3Method confint logis_fe
 
-confint.logis_fe <- function(fit, parm, level = 0.95, test = "exact", 
-                             option = c("gamma", "SR"), 
+confint.logis_fe <- function(fit, parm, level = 0.95, test = "exact",
+                             option = c("gamma", "SR"),
                              stdz = "indirect", measure = c("rate", "ratio")) {
   if (missing(fit)) stop ("Argument 'fit' is required!",call.=F)
   if (!class(fit) %in% c("logis_fe")) stop("Object fit is not of the classes 'logis_fe'!",call.=F)
   if (! "gamma" %in% option & !"SR" %in% option) stop("Object fit is not of the classes 'logis_fe'!", call.=F)
   alpha <- 1 - level
-  
+
   Y.char <- fit$char_list$Y.char
   Z.char <- fit$char_list$Z.char
   prov.char <- fit$char_list$prov.char
@@ -54,7 +62,7 @@ confint.logis_fe <- function(fit, parm, level = 0.95, test = "exact",
   beta <- fit$beta
   df.prov <- fit$df.prov
   prov.order <- rownames(fit$gamma)
-  
+
   #confidence of gamma
   confint_fe_gamma <- function(fit, test, parm, alpha) {
     data <- fit$data_include
@@ -67,19 +75,19 @@ confint.logis_fe <- function(fit, parm, level = 0.95, test = "exact",
     } else {
       stop("Argument 'parm' includes invalid elements!")
     }
-    
+
     if (test %in% c("score", "exact")) {
-      if (test=="score") { 
+      if (test=="score") {
         qnorm.halfalpha <- qnorm(alpha/2, lower=F)
         qnorm.alpha <- qnorm(alpha, lower=F)
-        CL.finite <- function(df) { 
-          prov <- ifelse(length(unique(df[,prov.char]))==1, unique(df[,prov.char]), 
+        CL.finite <- function(df) {
+          prov <- ifelse(length(unique(df[,prov.char]))==1, unique(df[,prov.char]),
                          stop("Number of providers involved NOT equal to one!"))
           UL.gamma <- function(Gamma) { #increasing function w.r.t gamma_null
             p <- plogis(Gamma+Z.beta)
             return((Obs - sum(p)) / sqrt(sum(p*(1-p))) + qnorm.halfalpha)
           }
-          LL.gamma <- function(Gamma) { 
+          LL.gamma <- function(Gamma) {
             p <- plogis(Gamma+Z.beta)
             return((Obs-sum(p)) / sqrt(sum(p*(1-p))) - qnorm.halfalpha)
           }
@@ -95,7 +103,7 @@ confint.logis_fe <- function(fit, parm, level = 0.95, test = "exact",
                          stop("Number of providers involved NOT equal to one!"))
           Z.beta <- as.matrix(df[,Z.char])%*%beta
           max.Z.beta <- norm(Z.beta, "I")
-          UL.gamma <- function(Gamma) { 
+          UL.gamma <- function(Gamma) {
             p <- plogis(Gamma+Z.beta)
             return(qnorm.alpha-sum(p)/sqrt(sum(p*(1-p))))
           }
@@ -108,7 +116,7 @@ confint.logis_fe <- function(fit, parm, level = 0.95, test = "exact",
                          stop("Number of providers involved NOT equal to one!"))
           Z.beta <- as.matrix(df[,Z.char])%*%beta
           max.Z.beta <- norm(Z.beta, "I")
-          LL.gamma <- function(Gamma) { 
+          LL.gamma <- function(Gamma) {
             p <- plogis(Gamma+Z.beta)
             return(sum(1-p)/sqrt(sum(p*(1-p)))-qnorm.alpha)
           }
@@ -122,7 +130,7 @@ confint.logis_fe <- function(fit, parm, level = 0.95, test = "exact",
             poibin::ppoibin(Obs-1,plogis(Gamma+Z.beta))+0.5*poibin::dpoibin(Obs,plogis(Gamma+Z.beta))-alpha/2
           LL.gamma <- function(Gamma)
             1-poibin::ppoibin(Obs,plogis(Gamma+Z.beta))+0.5*poibin::dpoibin(Obs,plogis(Gamma+Z.beta))-alpha/2
-          prov <- ifelse(length(unique(df[,prov.char]))==1, unique(df[,prov.char]), 
+          prov <- ifelse(length(unique(df[,prov.char]))==1, unique(df[,prov.char]),
                          stop("Number of providers involved NOT equal to one!"))
           Obs <- df.prov[prov, "Obs_facility"]
           Z.beta <- as.matrix(df[,Z.char])%*%beta
@@ -132,32 +140,32 @@ confint.logis_fe <- function(fit, parm, level = 0.95, test = "exact",
           return(return_mat)
         }
         CL.no.readm <- function(df) {
-          prov <- ifelse(length(unique(df[,prov.char]))==1, unique(df[,prov.char]), 
+          prov <- ifelse(length(unique(df[,prov.char]))==1, unique(df[,prov.char]),
                          stop("Number of providers involved NOT equal to one!"))
           Z.beta <- as.matrix(df[,Z.char])%*%beta
           max.Z.beta <- norm(Z.beta, "I")
-          gamma.upper <- uniroot(function(x) prod(plogis(-x-Z.beta))/2-alpha, 
+          gamma.upper <- uniroot(function(x) prod(plogis(-x-Z.beta))/2-alpha,
                                  (10+max.Z.beta)*c(-1,1))$root
           return_mat <- c(gamma[prov], -Inf, gamma.upper)
           return(return_mat)
         }
         CL.all.readm <- function(df) {
-          prov <- ifelse(length(unique(df[,prov.char]))==1, unique(df[,prov.char]), 
+          prov <- ifelse(length(unique(df[,prov.char]))==1, unique(df[,prov.char]),
                          stop("Number of providers involved NOT equal to one!"))
           Z.beta <- as.matrix(df[,Z.char])%*%beta
           max.Z.beta <- norm(Z.beta, "I")
-          gamma.lower <- uniroot(function(x) prod(plogis(x+Z.beta))/2-alpha, 
+          gamma.lower <- uniroot(function(x) prod(plogis(x+Z.beta))/2-alpha,
                                  (10+max.Z.beta)*c(-1,1))$root
           return_mat <- c(gamma[prov], gamma.lower, Inf)
           return(return_mat)
         }
       }
-      confint.finite <- sapply(by(data[(data$no.readm==0) & (data$all.readm==0),], 
-                                  data[(data$no.readm==0) & (data$all.readm==0),prov.char],identity), 
+      confint.finite <- sapply(by(data[(data$no.readm==0) & (data$all.readm==0),],
+                                  data[(data$no.readm==0) & (data$all.readm==0),prov.char],identity),
                                FUN=function(df) CL.finite(df))
-      confint.no.readm <- sapply(by(data[data$no.readm==1,], data[data$no.readm==1,prov.char],identity), 
+      confint.no.readm <- sapply(by(data[data$no.readm==1,], data[data$no.readm==1,prov.char],identity),
                                  FUN=function(df) CL.no.readm(df))
-      confint.all.readm <- sapply(by(data[data$all.readm==1,], data[data$all.readm==1,prov.char],identity), 
+      confint.all.readm <- sapply(by(data[data$all.readm==1,], data[data$all.readm==1,prov.char],identity),
                                   FUN=function(df) CL.all.readm(df))
       confint_df <- as.numeric(cbind(confint.finite, confint.no.readm, confint.all.readm))
       confint_df <- as.data.frame(matrix(confint_df, ncol = 3, byrow = T))
@@ -195,7 +203,7 @@ confint.logis_fe <- function(fit, parm, level = 0.95, test = "exact",
       se.gamma <- sqrt(info.gamma.inv+apply(mat.tmp, 1, FUN=function(x) t(matrix(x))%*%schur.inv%*%matrix(x)))
       gamma.lower <- gamma - qnorm(alpha/2, lower=F)*se.gamma
       gamma.upper <- gamma + qnorm(alpha/2, lower=F)*se.gamma
-      return_mat <- data.frame(gamma, gamma.lower, gamma.upper, 
+      return_mat <- data.frame(gamma, gamma.lower, gamma.upper,
                                row.names=names)
       return(return_mat)
     }
@@ -225,7 +233,7 @@ confint.logis_fe <- function(fit, parm, level = 0.95, test = "exact",
       #funcitons for calculate CI of SRs
       qnorm.halfalpha <- qnorm(alpha/2, lower=F)
       qnorm.alpha <- qnorm(alpha, lower=F)
-      SR_indirect.finite <- function(df) { 
+      SR_indirect.finite <- function(df) {
         prov <- ifelse(length(unique(df[,prov.char]))==1, unique(df[,prov.char]),
                        stop("Number of providers involved NOT equal to one!"))
         Z.beta <- as.matrix(df[,Z.char])%*%beta
@@ -258,39 +266,39 @@ confint.logis_fe <- function(fit, parm, level = 0.95, test = "exact",
         SR.upper <- nrow(df) / EXP.i
         return(c(SR.lower, SR.upper))
       }
-      
-      confint.finite <- sapply(by(data[(data$no.readm==0) & (data$all.readm==0),], 
-                                  data[(data$no.readm==0) & (data$all.readm==0),prov.char],identity), 
+
+      confint.finite <- sapply(by(data[(data$no.readm==0) & (data$all.readm==0),],
+                                  data[(data$no.readm==0) & (data$all.readm==0),prov.char],identity),
                                FUN=function(df) SR_indirect.finite(df))
-      confint.no.readm <- sapply(by(data[data$no.readm==1,], data[data$no.readm==1,prov.char],identity), 
+      confint.no.readm <- sapply(by(data[data$no.readm==1,], data[data$no.readm==1,prov.char],identity),
                                  FUN=function(df) SR_indirect.no.readm(df))
-      confint.all.readm <- sapply(by(data[data$all.readm==1,], data[data$all.readm==1,prov.char],identity), 
+      confint.all.readm <- sapply(by(data[data$all.readm==1,], data[data$all.readm==1,prov.char],identity),
                                   FUN=function(df) SR_indirect.all.readm(df))
-      
-      
-      CI.indirect_ratio <- as.numeric(rbind(t(indirect.ratio_df), 
+
+
+      CI.indirect_ratio <- as.numeric(rbind(t(indirect.ratio_df),
                                             cbind(confint.finite,
                                                   confint.no.readm,
                                                   confint.all.readm)))
       CI.indirect_ratio <- as.data.frame(matrix(CI.indirect_ratio, ncol = 3, byrow = T))
       colnames(CI.indirect_ratio) <- c("indirect_ratio", "CI_ratio.lower", "CI_ratio.upper")
       rownames(CI.indirect_ratio) <- names(indirect.rate_df)
-      
+
       if ("ratio" %in% measure){
         return_ls$CI.indirect_ratio <- CI.indirect_ratio
-        
-      } 
-      
+
+      }
+
       if ("rate" %in% measure){
         rate.lower <- pmax(pmin(CI.indirect_ratio$CI_ratio.lower * population_rate, 100), 0)
         rate.upper <- pmax(pmin(CI.indirect_ratio$CI_ratio.upper * population_rate, 100), 0)
         CI.indirect_rate <- as.data.frame(cbind(indirect.rate_df, rate.lower, rate.upper))
         colnames(CI.indirect_rate) <- c("indirect_rate", "CI_rate.lower", "CI_rate.upper")
         return_ls$CI.indirect_rate <- CI.indirect_rate
-      } 
+      }
     }
-    
-    
+
+
     if ("direct" %in% stdz) {
       SR.direct <- SR_output(fit, stdz = c("direct"), measure = c("ratio", "rate"))
       if (missing(parm)) {
@@ -309,8 +317,8 @@ confint.logis_fe <- function(fit, parm, level = 0.95, test = "exact",
       #funcitons for calculate CI of SRs
       qnorm.halfalpha <- qnorm(alpha/2, lower=F)
       qnorm.alpha <- qnorm(alpha, lower=F)
-      
-      SR_direct.finite <- function(ID) { 
+
+      SR_direct.finite <- function(ID) {
         Z.beta.all <- as.matrix(data.ori[,Z.char])%*%beta
         confint_gamma <- confint_fe_gamma(fit, test = test, parm = ID, alpha = alpha)
         gamma.lower <- confint_gamma$gamma.lower
@@ -334,37 +342,37 @@ confint.logis_fe <- function(fit, parm, level = 0.95, test = "exact",
         SR.upper <- nrow(data.ori) / OE_df.direct
         return(c(SR.lower, SR.upper))
       }
-      
-      confint.finite <- sapply(unique(data[(data$no.readm==0) & (data$all.readm==0),]$ID), 
+
+      confint.finite <- sapply(unique(data[(data$no.readm==0) & (data$all.readm==0),]$ID),
                                FUN = function(ID) SR_direct.finite(ID))
-      confint.no.readm <- sapply(unique(data[(data$no.readm==1) & (data$all.readm==0),]$ID), 
+      confint.no.readm <- sapply(unique(data[(data$no.readm==1) & (data$all.readm==0),]$ID),
                                  FUN = function(ID) SR_direct.no.readm(ID))
-      confint.all.readm <- sapply(unique(data[(data$no.readm==0) & (data$all.readm==1),]$ID), 
+      confint.all.readm <- sapply(unique(data[(data$no.readm==0) & (data$all.readm==1),]$ID),
                                   FUN = function(ID) SR_direct.all.readm(ID))
-      CI.direct_ratio <- as.numeric(rbind(t(direct.ratio_df), 
+      CI.direct_ratio <- as.numeric(rbind(t(direct.ratio_df),
                                           cbind(confint.finite,
                                                 confint.no.readm,
                                                 confint.all.readm)))
-      
+
       CI.direct_ratio <- as.data.frame(matrix(CI.direct_ratio, ncol = 3, byrow = T))
       colnames(CI.direct_ratio) <- c("direct_ratio", "CI_ratio.lower", "CI_ratio.upper")
       rownames(CI.direct_ratio) <- names(direct.rate_df)
-      
+
       if ("ratio" %in% measure){
         return_ls$CI.direct_ratio <- CI.direct_ratio
-        
-      } 
-      
+
+      }
+
       if ("rate" %in% measure){
         rate.lower <- pmax(pmin(CI.direct_ratio$CI_ratio.lower * population_rate, 100), 0)
         rate.upper <- pmax(pmin(CI.direct_ratio$CI_ratio.upper * population_rate, 100), 0)
         CI.direct_rate <- as.data.frame(cbind(direct.rate_df, rate.lower, rate.upper))
         colnames(CI.direct_rate) <- c("direct_rate", "CI_rate.lower", "CI_rate.upper")
         return_ls$CI.direct_rate <- CI.direct_rate
-      } 
+      }
     }
     return(return_ls)
   }
-  
-  
-} 
+
+
+}

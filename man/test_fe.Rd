@@ -14,21 +14,23 @@ test_fe(
 )
 }
 \arguments{
-\item{fit}{an object as output of \code{logis_fe} function}
+\item{fit}{an object as output of \code{logis_fe} function.}
 
-\item{parm}{specify a subset of which providers are to be given confidence intervals.}
+\item{parm}{specify a subset of which providers are to be given confidence intervals. All providers are included by default.}
 
-\item{level}{confidence level used for constructing confidence intervals. Defaulting to 0.95}
+\item{level}{confidence level used for constructing confidence intervals. Defaulting to 0.95.}
 
-\item{test}{a character string specifying the type of testing method to be conducted, defaulting to "exact.poisbinom"
-* `exact.poisbinom`: two-sided exact test based on Poisson-binomial distribution of \eqn{O_i|Z_i}
-* `exact.bootstrap`: two-sided exact test based on bootstrap procedure
-* `wald`: wald test
-* `score`: score test}
+\item{test}{a character string specifying the type of testing method to be conducted. Defaulting to "exact.poisbinom".
+\itemize{
+\item"exact.poisbinom": two-sided exact test based on Poisson-binomial distribution of \eqn{O_i|Z_i}
+\item"exact.bootstrap": two-sided exact test based on bootstrap procedure
+\item"wald": wald test
+\item"score": score test
+}}
 
-\item{null}{a character string or real number specifying null hypotheses of fixed provider effects}
+\item{null}{a character string or real number specifying null hypotheses of fixed provider effects.}
 
-\item{n}{resample size for bootstrapping, 10000 as default}
+\item{n}{resample size for bootstrapping. Defaulting to 10,000.}
 
 \item{...}{}
 }
@@ -50,7 +52,7 @@ The wald test is invalid for extreme providers (i.e. when provider effect goes t
 }
 \examples{
 data(data_FE)
-data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID)
+data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID, message = FALSE)
 fit_fe <- logis_fe(data.prep)
 test_fe(fit_fe)
 
@@ -59,8 +61,5 @@ test_fe(fit_fe)
 \itemize{
 \item Wu, W, Yang, Y, Kang, J, He, K. (2022) Improving large-scale estimation and inference for profiling health care providers.
 \emph{Statistics in Medicine}, \strong{41(15)}: 2840-2853.
-
-\item He K, Kalbfleisch, J, Li, Y, and et al. (2013) Evaluating hospital readmission rates in dialysis facilities; adjusting for hospital effects.
-\emph{Lifetime Data Analysis}, \strong{19}: 490-512.
 }
 }

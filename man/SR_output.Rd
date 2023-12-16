@@ -12,17 +12,21 @@ SR_output(
 )
 }
 \arguments{
-\item{fit}{an object as output of \code{logis_fe} function}
+\item{fit}{an object as output of \code{logis_fe} function.}
 
 \item{stdz}{a character string specifying the standardization method. Defaulting to "indirect".
-* `indirect`: using indirect standardized method
-* `direct`: using direct standardized method}
+\itemize{
+  \item{"indirect":} using indirect standardized method
+  \item{"direct":} using direct standardized method
+}}
 
 \item{measure}{a boolean indicating whether the output measure is "ratio" or "rate". Both "rate" and "ratio" will be provided by default.
-* `rate`: output the standardized rate. The "rate" has been restricted to 0% - 100%.
-* `ratio`:  output the standardized ratio}
+\itemize{
+  \item{"rate":} output the standardized rate. The "rate" has been restricted to 0% - 100%.
+  \item{"ratio":} output the standardized ratio.
+}}
 
-\item{null}{if "stdz = indirect", a character string or real number specifying null hypotheses of fixed provider effects for calculating standardized rate/ratio,}
+\item{null}{if "stdz = indirect", a character string or real number specifying null hypotheses of fixed provider effects for calculating standardized rate/ratio. Defaulting to "median".}
 
 \item{...}{}
 }
@@ -41,20 +45,20 @@ The return values depend on the user's choice of standardization method and meas
 Provide Outputs of Direct/indirect Standardization Ratio or Rate
 }
 \details{
-The "stdz" and "measure" arguments must be explicitly provided. 
+The "stdz" and "measure" arguments must be explicitly provided.
 Users are allowed to specify "stdz = c("indirect", "direct")" or "measure = c("rate", "ratio")" to get multiple measures.
 }
 \examples{
 data(data_FE)
-data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID)
+data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID, message = FALSE)
 fit_fe <- logis_fe(data.prep)
 SR <- SR_output(fit_fe, stdz = "indirect", measure = "ratio")
 SR$indirect.ratio
 
-
 }
 \references{
-Wu, W, Yang, Y, Kang, J, He, K. (2022) Improving large-scale estimation and inference for profiling health care providers.
-\emph{Statistics in Medicine}, \strong{41(15)}: 2840-2853.
-\cr
+\itemize{
+\item He K, Kalbfleisch, J, Li, Y, and et al. (2013) Evaluating hospital readmission rates in dialysis facilities; adjusting for hospital effects.
+\emph{Lifetime Data Analysis}, \strong{19}: 490-512.
+}
 }

@@ -15,28 +15,36 @@
 )
 }
 \arguments{
-\item{fit}{an object as output of \code{logis_fe} function}
+\item{fit}{an object as output of \code{logis_fe} function.}
 
-\item{parm}{specify a subset of which providers are to be given confidence intervals.}
+\item{parm}{specify a subset of which providers are to be given confidence intervals. All providers are included by default.}
 
-\item{level}{confidence level used for constructing confidence intervals. Defaulting to 0.95}
+\item{level}{confidence level used for constructing confidence intervals. Defaulting to 0.95.}
 
-\item{test}{a character string specifying the type of testing method, defaulting to "exact"
-* `exact`: exact test
-* `wald`: wald test
-* `score`: score test}
+\item{test}{a character string specifying the type of testing method. Defaulting to "exact".
+\itemize{
+\item "exact": exact test
+\item "wald": wald test
+\item "score": score test
+}}
 
-\item{option}{the confidence interval for the function's output, whether it is for gamma or standardization ratios/rates
-* `gamma`: provider effect
-* `SR`: standardization ratios/rates}
+\item{option}{the confidence interval for the function's output, whether it is for gamma or standardization ratios/rates.
+\itemize{
+\item "gamma": provider effect
+\item "SR": standardization ratios/rates
+}}
 
 \item{stdz}{if option = 'SR', a character string specifying the standardization method. Defaulting to "indirect".
-* `indirect`: using indirect standardized method
-* `direct`: using direct standardized method}
+\itemize{
+\item "indirect": using indirect standardized method
+\item "direct": using direct standardized method
+}}
 
 \item{measure}{if option = 'SR', a boolean indicating whether the output measure is "ratio" or "rate". Both "rate" and "ratio" will be provided by default.
-* `rate`: output the standardized rate. The "rate" has been restricted to 0% - 100%.
-* `ratio`:  output the standardized ratio}
+\itemize{
+\item "rate": output the standardized rate. The "rate" has been restricted to 0% - 100%.
+\item "ratio":  output the standardized ratio
+}}
 
 \item{...}{}
 }
@@ -48,7 +56,7 @@ Provide Confidence Interval for Provider effects or Standardization Ratios/Rates
 }
 \examples{
 data(data_FE)
-data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID)
+data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID, message = FALSE)
 fit_fe <- logis_fe(data.prep)
 confint(fit_fe, option = "gamma")
 confint(fit_fe, option = "SR", stdz = "direct", measure = "rate")

@@ -25,16 +25,20 @@ body {
 }
 </style>
 
-## Introduction:
+## Introduction
 
-The `srrFE` software package is designed to implement the SerBIN method proposed by Wu et al. (2022) (doi:10.1002/sim.9387), specifically tailored to address the computational challenges inherent in large-scale provider data.  Additionally, the package is equipped with functions designed to estimate standardized ratios and rates and conduct hypothesis testing.
+The `srrFE` software package is designed to implement the SerBIN method proposed by [Wu et al. (2022)](https://onlinelibrary.wiley.com/doi/full/10.1002/sim.9387), specifically tailored to address the computational challenges inherent in large-scale provider data. Additionally, the package is equipped with functions designed to estimate standardized ratios and rates and conduct hypothesis testing.
 
-In this vignette, we will explore the fundamental usage of the functions integrated into the current R package. For more details, please consult the `Reference` section. To learn the algorithms employed by `srrFE`, refer to the `Articles/Models` section or see the original articles:
+In this vignette, we will explore the fundamental usage of the functions integrated into the current R package. 
 
-* [Wu, W., Yang, Y., Kang, J., & He, K. (2022). Improving large‐scale estimation and inference for profiling health care providers. Statistics in Medicine, 41(15), 2840-2853.](https://onlinelibrary.wiley.com/doi/full/10.1002/sim.9387)
-* [He, K., Kalbfleisch, J. D., Li, Y., & Li, Y. (2013). Evaluating hospital readmission rates in dialysis facilities; adjusting for hospital effects. Lifetime Data Analysis, 19, 490-512.](https://link.springer.com/article/10.1007/s10985-013-9264-6)
+* For more details, please see the [Reference](https://um-kevinhe.github.io/srrFE/reference/index.html) section. 
 
-## Installation:
+* To learn the algorithms employed by `srrFE`, refer to the [Models](https://um-kevinhe.github.io/srrFE/articles/Models.html) section or see the [original articles](https://um-kevinhe.github.io/srrFE/articles/Articles.html).
+
+* If you need a more concise guide to quickly use the package, please refer to the [Quick Start](https://um-kevinhe.github.io/srrFE/articles/Quick-start.html).
+
+
+## Installation
 
 ```{r ,include=TRUE,eval=FALSE}
 require("devtools")
@@ -42,6 +46,7 @@ require("remotes")
 remotes::install_github("UM-KevinHe/srrFE", ref = "main")
 ```
 
+---
 
 ## Example
 
@@ -60,7 +65,7 @@ data(data_FE)
 
 ### Data Preparation Function
 
-Typically, users should employ the `fe_data_prep()` function to preprocess their data. We advise users to review the data and consider making adjustments based on the output information if necessary. Please know that the subsequent functions should be used based on the processed data.
+Typically, users should employ the `fe_data_prep()` function to preprocess their data. We advise users to review the data and consider making adjustments based on the output information if necessary. (**Please know that the subsequent functions should be used based on this processed data**)
 
 ```{r}
 data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID)
@@ -83,7 +88,7 @@ coef(fit_fe)
 
 ### Measures Output
 
-Based on the results obtained from the fitted model, users can easily calculate direct or indirect standardized rates and ratios as per their specific requirements. The `SR_output()` function simply necessitates the users to input the object returned from the preceding `logis_fe()` function and specify the desired type of measure. By default, both indirect standardized rate and indirect standardized ratio will be provided.
+Based on the results obtained from the fitted model, users can easily calculate direct or indirect standardized rates and ratios as per their specific requirements. The `SR_output()` function simply necessitates the users to input the object returned from the `logis_fe()` function and specify the desired type of measure. By default, both indirect standardized rate and indirect standardized ratio will be provided.
 
 ```{r}
 SR <- SR_output(fit_fe)
@@ -103,7 +108,7 @@ The function returns a 3-column dataframe, with the "flag" column indicating whe
 
 ### Hypothesis Testing for Covariate Coefficients
 
-Additionally, we offer the `summary_fe_covar()` function, which provides the test statistics for the covariate coefficients. The test statistics can be calculated by the "wald test" (`"wald.cpp"` or `"wald"` option), "score test" (`"score"` option), or "likelihood ratio test" (`"lr"` option). 
+Additionally, we offer the `summary_fe_covar()` function, which provides the test statistics for the covariate coefficients $\beta$. The test statistics can be calculated by the "wald test" (use `"wald.cpp"` or `"wald"` option), "score test" (use `"score"` option), or "likelihood ratio test" (use `"lr"` option). 
 
 
 ```{r}

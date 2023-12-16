@@ -1,17 +1,19 @@
 #=== SUMMARY STATISTICS FOR COVARIATE ESTIMATES =================================
 #' Provide the Summary Statistics for Covariate Estimates
 #'
-#' @param fit an object as output of \code{logis_fe} function
+#' @param fit an object as output of \code{logis_fe} function.
 #'
-#' @param parm a character vector specifies a subset of covariates
+#' @param parm a character vector specifies a subset of covariates. All covariates are included by default.
 #'
-#' @param level confidence level used for constructing confidence intervals. Defaulting to 0.95
+#' @param level confidence level used for constructing confidence intervals. Defaulting to 0.95.
 #'
-#' @param test a character string specifying the type of testing method, defaulting to "wald.cpp"
-#'   * `wald`: wald test
-#'   * `wald.cpp`: wald test using cpp function
-#'   * `lr`: likelihood ratio test
-#'   * `score`: score test
+#' @param test a character string specifying the type of testing method. Defaulting to "wald.cpp".
+#'   \itemize{
+#'     \item "wald": wald test
+#'     \item "wald.cpp": wald test using cpp function
+#'     \item "lr": likelihood ratio test
+#'     \item "score": score test
+#'   }
 #'
 #' @param null the null value of the covariate estimate that requires testing. (e.g. test \eqn{H_0: \beta = 0})
 #'
@@ -22,7 +24,7 @@
 #'
 #' @examples
 #' data(data_FE)
-#' data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID)
+#' data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID, message = FALSE)
 #' fit_fe <- logis_fe(data.prep)
 #' summary.wald.cpp <- summary_fe_covar(fit_fe, level = 0.05, test = "wald")
 #' summary.wald.cpp

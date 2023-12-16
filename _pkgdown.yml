@@ -1,8 +1,32 @@
-url: https://github.com/UM-KevinHe/srrFE
+url: https://um-kevinhe.github.io/srrFE/
 template:
   params:
     bootswatch: lumen
     ganalytics: UA-54921687-5
+    mathjax: true
+
+vignettes:
+  - vignettes/srrFE.Rmd
+
+authors:
+  Kevin He:
+    href: "https://www.um-kevinhe-group.org/"
+  Wenbo Wu:
+    href: "https://www.wenbowu.me/"
+
+navbar:
+ components:
+   articles:
+    text: Appendix
+    menu:
+    - text: Quick Start
+      href: articles/Quick-start.html
+    - text: Models
+      href: articles/Models.html
+    - text: -------
+    - text: Articles
+      href: articles/Articles.html
+
 reference:
 - title: Function for Data Preparation Function
   contents:

@@ -7,7 +7,7 @@
 \method{coef}{logis_fe}(fit, ...)
 }
 \arguments{
-\item{fit}{an object as output of \code{logis_fe} function}
+\item{fit}{an object as output of \code{logis_fe} function.}
 
 \item{...}{}
 }
@@ -16,7 +16,7 @@ Return the model coefficients of a \code{logis_fe} object
 }
 \examples{
 data(data_FE)
-data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID)
+data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID, message = FALSE)
 fit_fe <- logis_fe(data.prep)
-coef(fit_fe)  #covariate coefficient
+coef(fit_fe)
 }

@@ -36,19 +36,23 @@
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    Articles
+    Appendix
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/Models.html">Models</a>
+      <a href="../articles/Quick-start.html">Quick Start</a>
     </li>
     <li>
-      <a href="../articles/Quick-start.html">Quick Start</a>
+      <a href="../articles/Models.html">Models</a>
+    </li>
+    <li class="divider">
+    <li>
+      <a href="../articles/Articles.html">Articles</a>
     </li>
   </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://github.com/UM-KevinHe/srrFE/">
+  <a href="https://github.com/UM-KevinHe/srrFE/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -63,7 +67,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Data Preparation for Fixed Effects Modelling</h1>
-    <small class="dont-index">Source: <a href="https://github.com/UM-KevinHe/srrFE/blob/HEAD/R/fe_data_prep.R"><code>R/fe_data_prep.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/UM-KevinHe/srrFE/blob/HEAD/R/fe_data_prep.R" class="external-link"><code>R/fe_data_prep.R</code></a></small>
     <div class="hidden name"><code>fe_data_prep.Rd</code></div>
     </div>
 
@@ -72,7 +76,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fe_data_prep</span><span class="op">(</span><span class="va">Y</span>, <span class="va">Z</span>, <span class="va">ID</span>, cutoff <span class="op">=</span> <span class="fl">10</span>, check <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fe_data_prep</span><span class="op">(</span><span class="va">Y</span>, <span class="va">Z</span>, <span class="va">ID</span>, cutoff <span class="op">=</span> <span class="fl">10</span>, check <span class="op">=</span> <span class="cn">TRUE</span>, message <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -97,6 +101,10 @@
 <dd><p>a Boolean indicating whether checking missingness, variation, correlation and VIF of variables in the data. Defaulting to "TRUE".</p></dd>
 
 
+<dt>message</dt>
+<dd><p>a Boolean indicating whether printing out the information of the data preparation process. Defaulting to "TRUE".</p></dd>
+
+
 <dt>...</dt>
 <dd></dd>
 
@@ -113,14 +121,13 @@
 </dl></div>
     <div id="details">
     <h2>Details</h2>
-    <p>Major steps in this stage include (in order):
-  * checking missingness, variation, correlation and VIF of variables in the data,
-  * provider screening based on number of discharges, 10 as default,
-  * calculating the total number of facilities and hospitals,
-  * reporting proportions of facilities with no readmission within 30 days, and with all readmission within 30 days after discharge,
-  * modifying responses to prevent infinite log-likelihoods during model fitting, and
-  * sorting data by hospital and provider identifiers.</p>  
-<p>The `fe_data_prep()` function not only returns the original data sorted by provider identifiers,
+    <p>Major steps in this stage include (in order):</p><ul><li><p>checking missingness, variation, correlation and VIF of variables in the data,</p></li>
+<li><p>provider screening based on number of discharges, 10 as default,</p></li>
+<li><p>calculating the total number of facilities and hospitals,</p></li>
+<li><p>reporting proportions of facilities with no readmission within 30 days, and with all readmission within 30 days after discharge,</p></li>
+<li><p>modifying responses to prevent infinite log-likelihoods during model fitting, and</p></li>
+<li><p>sorting data by hospital and provider identifiers.</p></li>
+</ul><p>The `fe_data_prep()` function not only returns the original data sorted by provider identifiers,
 but also outputs vectors that indicate whether the provider has zero or all readmissions, and
 a dataframe combines all the output information is also provided.</p>
     </div>

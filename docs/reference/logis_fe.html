@@ -36,19 +36,23 @@
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    Articles
+    Appendix
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/Models.html">Models</a>
+      <a href="../articles/Quick-start.html">Quick Start</a>
     </li>
     <li>
-      <a href="../articles/Quick-start.html">Quick Start</a>
+      <a href="../articles/Models.html">Models</a>
+    </li>
+    <li class="divider">
+    <li>
+      <a href="../articles/Articles.html">Articles</a>
     </li>
   </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://github.com/UM-KevinHe/srrFE/">
+  <a href="https://github.com/UM-KevinHe/srrFE/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -63,7 +67,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Main Function for Fitting Fixed Effects Model</h1>
-    <small class="dont-index">Source: <a href="https://github.com/UM-KevinHe/srrFE/blob/HEAD/R/logis_fe.R"><code>R/logis_fe.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/UM-KevinHe/srrFE/blob/HEAD/R/logis_fe.R" class="external-link"><code>R/logis_fe.R</code></a></small>
     <div class="hidden name"><code>logis_fe.Rd</code></div>
     </div>
 
@@ -92,37 +96,37 @@
 
 
 <dt>algorithm</dt>
-<dd><p>a string specifying the algorithm to be used. Defaulting to "SerBIN".
-* `SerBIN`: using the Serial blockwise inversion Newton algorithm to fit the model (See reference: Wu et al.).
-* `BAN`: using the block ascent Newton algorithm to fit the model (See reference: He et al.).</p></dd>
+<dd><p>a string specifying the algorithm to be used. Defaulting to "SerBIN".</p><ul><li><p>"SerBIN": using the Serial blockwise inversion Newton algorithm to fit the model (See reference: Wu et al.).</p></li>
+<li><p>"BAN": using the block ascent Newton algorithm to fit the model (See reference: He et al.).</p></li>
+</ul></dd>
 
 
 <dt>max.iter</dt>
-<dd><p>maximum number of iterations</p></dd>
+<dd><p>maximum number of iterations. Defaulting to 10,000.</p></dd>
 
 
 <dt>tol</dt>
-<dd><p>a small positive number specifying stopping criterion of Newton-Raphson algorithm</p></dd>
+<dd><p>a small positive number specifying stopping criterion of Newton-Raphson algorithm. Defaulting to 1e-5.</p></dd>
 
 
 <dt>bound</dt>
-<dd><p>a positive number to avoid inflation of provider effect. Default is 10.</p></dd>
+<dd><p>a positive number to avoid inflation of provider effect. Defaulting to 10.</p></dd>
 
 
 <dt>backtrack</dt>
-<dd><p>a boolean indicating whether backtracking line search is implemented, defaulting to FALSE</p></dd>
+<dd><p>a boolean indicating whether backtracking line search is implemented. Defaulting to FALSE.</p></dd>
 
 
 <dt>Rcpp</dt>
-<dd><p>a Boolean indicating whether the Rcpp function is used, defaulting to TRUE</p></dd>
+<dd><p>a Boolean indicating whether the Rcpp function is used. Defaulting to TRUE.</p></dd>
 
 
 <dt>AUC</dt>
-<dd><p>a Boolean indicating whether report AUC, defaulting to FALSE</p></dd>
+<dd><p>a Boolean indicating whether report AUC. Defaulting to FALSE.</p></dd>
 
 
 <dt>message</dt>
-<dd><p>a Boolean indicating whether track the fitting process</p></dd>
+<dd><p>a Boolean indicating whether track the fitting process. Defaulting to TRUE.</p></dd>
 
 
 <dt>...</dt>
@@ -137,7 +141,7 @@
 <dl><dt>beta</dt>
 <dd><p>a vector of fixed effects estimates of covariates</p></dd>
 
-            
+
 <dt>gamma</dt>
 <dd><p>a vector of estimates of facility effects</p></dd>
 
@@ -164,10 +168,10 @@
 </dl></div>
     <div id="details">
     <h2>Details</h2>
-    <p>The default algorithm is based on Serial blockwise inversion Newton (SerBIN) proposed by Wu et al. (2022), 
+    <p>The default algorithm is based on Serial blockwise inversion Newton (SerBIN) proposed by Wu et al. (2022),
 but users can also choose to use the block ascent Newton (BAN) algorithm proposed by He et al. (2013) to fit the model.
-We suggest using the default "SerBIN" option as it typically converges much faster for most datasets. 
-However, in rare cases where the SerBIN algorithm encounters second-order derivative irreversibility leading to an error, 
+We suggest using the default "SerBIN" option as it typically converges much faster for most datasets.
+However, in rare cases where the SerBIN algorithm encounters second-order derivative irreversibility leading to an error,
 users can consider using the "BAN" option as an alternative.</p>
     </div>
     <div id="references">
@@ -182,19 +186,7 @@ users can consider using the "BAN" option as an alternative.</p>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">data_FE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">data.prep</span> <span class="op">&lt;-</span> <span class="fu"><a href="fe_data_prep.html">fe_data_prep</a></span><span class="op">(</span><span class="va">data_FE</span><span class="op">$</span><span class="va">Y</span>, <span class="va">data_FE</span><span class="op">$</span><span class="va">Z</span>, <span class="va">data_FE</span><span class="op">$</span><span class="va">ID</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking missingness of variables ... </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Missing values NOT found. Checking missingness of variables completed!</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking variation in covariates ... </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking variation in covariates completed!</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking pairwise correlation among covariates ... </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking pairwise correlation among covariates completed!</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking VIF of covariates ... </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking VIF of covariates completed!</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>0 out of 10 providers considered small and filtered out!</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0 out of 10 remaining providers with no readmission within 30 days.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0 out of 10 remaining providers with all readmissions within 30 days.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> After screening, 52% of all discharges were readmitted within 30 days.</span>
+<span class="r-in"><span><span class="va">data.prep</span> <span class="op">&lt;-</span> <span class="fu"><a href="fe_data_prep.html">fe_data_prep</a></span><span class="op">(</span><span class="va">data_FE</span><span class="op">$</span><span class="va">Y</span>, <span class="va">data_FE</span><span class="op">$</span><span class="va">Z</span>, <span class="va">data_FE</span><span class="op">$</span><span class="va">ID</span>, message <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">fit_fe</span> <span class="op">&lt;-</span> <span class="fu">logis_fe</span><span class="op">(</span><span class="va">data.prep</span>, message <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

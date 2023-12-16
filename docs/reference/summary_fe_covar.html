@@ -36,19 +36,23 @@
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    Articles
+    Appendix
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/Models.html">Models</a>
+      <a href="../articles/Quick-start.html">Quick Start</a>
     </li>
     <li>
-      <a href="../articles/Quick-start.html">Quick Start</a>
+      <a href="../articles/Models.html">Models</a>
+    </li>
+    <li class="divider">
+    <li>
+      <a href="../articles/Articles.html">Articles</a>
     </li>
   </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://github.com/UM-KevinHe/srrFE/">
+  <a href="https://github.com/UM-KevinHe/srrFE/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -63,7 +67,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Provide the Summary Statistics for Covariate Estimates</h1>
-    <small class="dont-index">Source: <a href="https://github.com/UM-KevinHe/srrFE/blob/HEAD/R/summary_fe_covar.R"><code>R/summary_fe_covar.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/UM-KevinHe/srrFE/blob/HEAD/R/summary_fe_covar.R" class="external-link"><code>R/summary_fe_covar.R</code></a></small>
     <div class="hidden name"><code>summary_fe_covar.Rd</code></div>
     </div>
 
@@ -78,23 +82,23 @@
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>fit</dt>
-<dd><p>an object as output of <code>logis_fe</code> function</p></dd>
+<dd><p>an object as output of <code>logis_fe</code> function.</p></dd>
 
 
 <dt>parm</dt>
-<dd><p>a character vector specifies a subset of covariates</p></dd>
+<dd><p>a character vector specifies a subset of covariates. All covariates are included by default.</p></dd>
 
 
 <dt>level</dt>
-<dd><p>confidence level used for constructing confidence intervals. Defaulting to 0.95</p></dd>
+<dd><p>confidence level used for constructing confidence intervals. Defaulting to 0.95.</p></dd>
 
 
 <dt>test</dt>
-<dd><p>a character string specifying the type of testing method, defaulting to "wald.cpp"
-* `wald`: wald test
-* `wald.cpp`: wald test using cpp function
-* `lr`: likelihood ratio test
-* `score`: score test</p></dd>
+<dd><p>a character string specifying the type of testing method. Defaulting to "wald.cpp".</p><ul><li><p>"wald": wald test</p></li>
+<li><p>"wald.cpp": wald test using cpp function</p></li>
+<li><p>"lr": likelihood ratio test</p></li>
+<li><p>"score": score test</p></li>
+</ul></dd>
 
 
 <dt>null</dt>
@@ -115,19 +119,7 @@
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">data_FE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">data.prep</span> <span class="op">&lt;-</span> <span class="fu"><a href="fe_data_prep.html">fe_data_prep</a></span><span class="op">(</span><span class="va">data_FE</span><span class="op">$</span><span class="va">Y</span>, <span class="va">data_FE</span><span class="op">$</span><span class="va">Z</span>, <span class="va">data_FE</span><span class="op">$</span><span class="va">ID</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking missingness of variables ... </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Missing values NOT found. Checking missingness of variables completed!</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking variation in covariates ... </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking variation in covariates completed!</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking pairwise correlation among covariates ... </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking pairwise correlation among covariates completed!</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking VIF of covariates ... </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking VIF of covariates completed!</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>0 out of 10 providers considered small and filtered out!</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0 out of 10 remaining providers with no readmission within 30 days.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0 out of 10 remaining providers with all readmissions within 30 days.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> After screening, 52% of all discharges were readmitted within 30 days.</span>
+<span class="r-in"><span><span class="va">data.prep</span> <span class="op">&lt;-</span> <span class="fu"><a href="fe_data_prep.html">fe_data_prep</a></span><span class="op">(</span><span class="va">data_FE</span><span class="op">$</span><span class="va">Y</span>, <span class="va">data_FE</span><span class="op">$</span><span class="va">Z</span>, <span class="va">data_FE</span><span class="op">$</span><span class="va">ID</span>, message <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">fit_fe</span> <span class="op">&lt;-</span> <span class="fu"><a href="logis_fe.html">logis_fe</a></span><span class="op">(</span><span class="va">data.prep</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">summary.wald.cpp</span> <span class="op">&lt;-</span> <span class="fu">summary_fe_covar</span><span class="op">(</span><span class="va">fit_fe</span>, level <span class="op">=</span> <span class="fl">0.05</span>, test <span class="op">=</span> <span class="st">"wald"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">summary.wald.cpp</span></span></span>

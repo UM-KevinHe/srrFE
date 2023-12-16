@@ -23,7 +23,7 @@ See ["Getting Started with srrFE"](https://um-kevinhe.github.io/srrFE/articles/s
 
 ## Details of the algorithms
 
-See ["Models"](https://um-kevinhe.github.io/srrFE/articles/Models.html)
+See ["Models"](https://um-kevinhe.github.io/srrFE/articles/Models.html) or [original articles](https://um-kevinhe.github.io/srrFE/articles/Articles.html)
 
 ## Getting Help
 

@@ -20,22 +20,24 @@ logis_fe(
 \item{data.prep}{an object from the `fe_data_prep()` function.}
 
 \item{algorithm}{a string specifying the algorithm to be used. Defaulting to "SerBIN".
-* `SerBIN`: using the Serial blockwise inversion Newton algorithm to fit the model (See reference: Wu et al.).
-* `BAN`: using the block ascent Newton algorithm to fit the model (See reference: He et al.).}
+\itemize{
+\item "SerBIN": using the Serial blockwise inversion Newton algorithm to fit the model (See reference: Wu et al.).
+\item "BAN": using the block ascent Newton algorithm to fit the model (See reference: He et al.).
+}}
 
-\item{max.iter}{maximum number of iterations}
+\item{max.iter}{maximum number of iterations. Defaulting to 10,000.}
 
-\item{tol}{a small positive number specifying stopping criterion of Newton-Raphson algorithm}
+\item{tol}{a small positive number specifying stopping criterion of Newton-Raphson algorithm. Defaulting to 1e-5.}
 
-\item{bound}{a positive number to avoid inflation of provider effect. Default is 10.}
+\item{bound}{a positive number to avoid inflation of provider effect. Defaulting to 10.}
 
-\item{backtrack}{a boolean indicating whether backtracking line search is implemented, defaulting to FALSE}
+\item{backtrack}{a boolean indicating whether backtracking line search is implemented. Defaulting to FALSE.}
 
-\item{Rcpp}{a Boolean indicating whether the Rcpp function is used, defaulting to TRUE}
+\item{Rcpp}{a Boolean indicating whether the Rcpp function is used. Defaulting to TRUE.}
 
-\item{AUC}{a Boolean indicating whether report AUC, defaulting to FALSE}
+\item{AUC}{a Boolean indicating whether report AUC. Defaulting to FALSE.}
 
-\item{message}{a Boolean indicating whether track the fitting process}
+\item{message}{a Boolean indicating whether track the fitting process. Defaulting to TRUE.}
 
 \item{...}{}
 }
@@ -43,7 +45,7 @@ logis_fe(
 An object with S3 class \code{logis_fe}.
 
 \item{beta}{a vector of fixed effects estimates of covariates}
-            
+
 \item{gamma}{a vector of estimates of facility effects}
 
 \item{obs}{a vector of patients-level outcome}
@@ -60,15 +62,15 @@ An object with S3 class \code{logis_fe}.
 Main Function for Fitting Fixed Effects Model
 }
 \details{
-The default algorithm is based on Serial blockwise inversion Newton (SerBIN) proposed by Wu et al. (2022), 
+The default algorithm is based on Serial blockwise inversion Newton (SerBIN) proposed by Wu et al. (2022),
 but users can also choose to use the block ascent Newton (BAN) algorithm proposed by He et al. (2013) to fit the model.
-We suggest using the default "SerBIN" option as it typically converges much faster for most datasets. 
-However, in rare cases where the SerBIN algorithm encounters second-order derivative irreversibility leading to an error, 
+We suggest using the default "SerBIN" option as it typically converges much faster for most datasets.
+However, in rare cases where the SerBIN algorithm encounters second-order derivative irreversibility leading to an error,
 users can consider using the "BAN" option as an alternative.
 }
 \examples{
 data(data_FE)
-data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID)
+data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID, message = FALSE)
 fit_fe <- logis_fe(data.prep, message = TRUE)
 
 }

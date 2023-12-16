@@ -4,7 +4,7 @@
 \alias{fe_data_prep}
 \title{Data Preparation for Fixed Effects Modelling}
 \usage{
-fe_data_prep(Y, Z, ID, cutoff = 10, check = TRUE)
+fe_data_prep(Y, Z, ID, cutoff = 10, check = TRUE, message = TRUE)
 }
 \arguments{
 \item{Y}{a numerical vector, with values of 0 or 1, indicating the outcome variable.}
@@ -16,6 +16,8 @@ fe_data_prep(Y, Z, ID, cutoff = 10, check = TRUE)
 \item{cutoff}{an integer as cutoff of provider size with 10 as default. Facilities with observations fewer than the "cutoff" value will be labeled as "include = 0".}
 
 \item{check}{a Boolean indicating whether checking missingness, variation, correlation and VIF of variables in the data. Defaulting to "TRUE".}
+
+\item{message}{a Boolean indicating whether printing out the information of the data preparation process. Defaulting to "TRUE".}
 
 \item{...}{}
 }
@@ -29,13 +31,16 @@ Data Preparation for Fixed Effects Modelling
 }
 \details{
 Major steps in this stage include (in order):
-  * checking missingness, variation, correlation and VIF of variables in the data,
-  * provider screening based on number of discharges, 10 as default,
-  * calculating the total number of facilities and hospitals,
-  * reporting proportions of facilities with no readmission within 30 days, and with all readmission within 30 days after discharge,
-  * modifying responses to prevent infinite log-likelihoods during model fitting, and
-  * sorting data by hospital and provider identifiers.
-  
+  \itemize{
+  \item checking missingness, variation, correlation and VIF of variables in the data,
+  \item provider screening based on number of discharges, 10 as default,
+  \item calculating the total number of facilities and hospitals,
+  \item reporting proportions of facilities with no readmission within 30 days, and with all readmission within 30 days after discharge,
+  \item modifying responses to prevent infinite log-likelihoods during model fitting, and
+  \item sorting data by hospital and provider identifiers.
+  }
+
+
 The `fe_data_prep()` function not only returns the original data sorted by provider identifiers,
 but also outputs vectors that indicate whether the provider has zero or all readmissions, and
 a dataframe combines all the output information is also provided.

@@ -53,23 +53,28 @@
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    Articles
+    Appendix
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/Models.html">Models</a>
+      <a href="../articles/Quick-start.html">Quick Start</a>
     </li>
     <li>
-      <a href="../articles/Quick-start.html">Quick Start</a>
+      <a href="../articles/Models.html">Models</a>
+    </li>
+    <li class="divider">
+    </li>
+<li>
+      <a href="../articles/Articles.html">Articles</a>
     </li>
   </ul>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/UM-KevinHe/srrFE/">
+  <a href="https://github.com/UM-KevinHe/srrFE/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -92,7 +97,7 @@
             
             <h4 data-toc-skip class="date"><span style="font-style:normal;font-family:'Open Sans'">2023-12-16</span></h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/UM-KevinHe/srrFE/blob/HEAD/vignettes/srrFE.Rmd"><code>vignettes/srrFE.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/UM-KevinHe/srrFE/blob/HEAD/vignettes/srrFE.Rmd" class="external-link"><code>vignettes/srrFE.Rmd</code></a></small>
       <div class="hidden name"><code>srrFE.Rmd</code></div>
 
     </div>
@@ -105,22 +110,24 @@ body {
 }
 </style>
 <div class="section level2">
-<h2 id="introduction">Introduction:<a class="anchor" aria-label="anchor" href="#introduction"></a>
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>The <code>srrFE</code> software package is designed to implement the SerBIN method proposed by Wu et al. (2022) (<a href="doi:10.1002/sim.9387" class="uri">doi:10.1002/sim.9387</a>), specifically tailored to address the computational challenges inherent in large-scale provider data. Additionally, the package is equipped with functions designed to estimate standardized ratios and rates and conduct hypothesis testing.</p>
-<p>In this vignette, we will explore the fundamental usage of the functions integrated into the current R package. For more details, please consult the <code>Reference</code> section. To learn the algorithms employed by <code>srrFE</code>, refer to the <code>Articles/Models</code> section or see the original articles:</p>
+<p>The <code>srrFE</code> software package is designed to implement the SerBIN method proposed by <a href="https://onlinelibrary.wiley.com/doi/full/10.1002/sim.9387" class="external-link">Wu et al. (2022)</a>, specifically tailored to address the computational challenges inherent in large-scale provider data. Additionally, the package is equipped with functions designed to estimate standardized ratios and rates and conduct hypothesis testing.</p>
+<p>In this vignette, we will explore the fundamental usage of the functions integrated into the current R package.</p>
 <ul>
-<li><a href="https://onlinelibrary.wiley.com/doi/full/10.1002/sim.9387" class="external-link">Wu, W., Yang, Y., Kang, J., &amp; He, K. (2022). Improving large‐scale estimation and inference for profiling health care providers. Statistics in Medicine, 41(15), 2840-2853.</a></li>
-<li><a href="https://link.springer.com/article/10.1007/s10985-013-9264-6" class="external-link">He, K., Kalbfleisch, J. D., Li, Y., &amp; Li, Y. (2013). Evaluating hospital readmission rates in dialysis facilities; adjusting for hospital effects. Lifetime Data Analysis, 19, 490-512.</a></li>
+<li><p>For more details, please see the <a href="https://um-kevinhe.github.io/srrFE/reference/index.html">Reference</a> section.</p></li>
+<li><p>To learn the algorithms employed by <code>srrFE</code>, refer to the <a href="https://um-kevinhe.github.io/srrFE/articles/Models.html">Models</a> section or see the <a href="https://um-kevinhe.github.io/srrFE/articles/Articles.html">original articles</a>.</p></li>
+<li><p>If you need a more concise guide to quickly use the package, please refer to the <a href="https://um-kevinhe.github.io/srrFE/articles/Quick-start.html">Quick Start</a>.</p></li>
 </ul>
 </div>
 <div class="section level2">
-<h2 id="installation">Installation:<a class="anchor" aria-label="anchor" href="#installation"></a>
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://devtools.r-lib.org/" class="external-link">"devtools"</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://remotes.r-lib.org" class="external-link">"remotes"</a></span><span class="op">)</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"UM-KevinHe/srrFE"</span>, ref <span class="op">=</span> <span class="st">"main"</span><span class="op">)</span></span></code></pre></div>
+<hr>
 </div>
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
@@ -132,12 +139,12 @@ body {
 <li><p>Z: 4 continuous covariates</p></li>
 </ul>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/UM-KevinHe/srrFE">srrFE</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/UM-KevinHe/srrFE" class="external-link">srrFE</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">data_FE</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="data-preparation-function">Data Preparation Function<a class="anchor" aria-label="anchor" href="#data-preparation-function"></a>
 </h3>
-<p>Typically, users should employ the <code><a href="../reference/fe_data_prep.html">fe_data_prep()</a></code> function to preprocess their data. We advise users to review the data and consider making adjustments based on the output information if necessary. Please know that the subsequent functions should be used based on the processed data.</p>
+<p>Typically, users should employ the <code><a href="../reference/fe_data_prep.html">fe_data_prep()</a></code> function to preprocess their data. We advise users to review the data and consider making adjustments based on the output information if necessary. (<strong>Please know that the subsequent functions should be used based on this processed data</strong>)</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data.prep</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fe_data_prep.html">fe_data_prep</a></span><span class="op">(</span><span class="va">data_FE</span><span class="op">$</span><span class="va">Y</span>, <span class="va">data_FE</span><span class="op">$</span><span class="va">Z</span>, <span class="va">data_FE</span><span class="op">$</span><span class="va">ID</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking missingness of variables ...</span></span>
@@ -193,7 +200,7 @@ body {
 <div class="section level3">
 <h3 id="measures-output">Measures Output<a class="anchor" aria-label="anchor" href="#measures-output"></a>
 </h3>
-<p>Based on the results obtained from the fitted model, users can easily calculate direct or indirect standardized rates and ratios as per their specific requirements. The <code><a href="../reference/SR_output.html">SR_output()</a></code> function simply necessitates the users to input the object returned from the preceding <code><a href="../reference/logis_fe.html">logis_fe()</a></code> function and specify the desired type of measure. By default, both indirect standardized rate and indirect standardized ratio will be provided.</p>
+<p>Based on the results obtained from the fitted model, users can easily calculate direct or indirect standardized rates and ratios as per their specific requirements. The <code><a href="../reference/SR_output.html">SR_output()</a></code> function simply necessitates the users to input the object returned from the <code><a href="../reference/logis_fe.html">logis_fe()</a></code> function and specify the desired type of measure. By default, both indirect standardized rate and indirect standardized ratio will be provided.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">SR</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SR_output.html">SR_output</a></span><span class="op">(</span><span class="va">fit_fe</span><span class="op">)</span></span>
 <span><span class="va">SR</span><span class="op">$</span><span class="va">indirect.rate</span></span>
@@ -244,7 +251,7 @@ body {
 <div class="section level3">
 <h3 id="hypothesis-testing-for-covariate-coefficients">Hypothesis Testing for Covariate Coefficients<a class="anchor" aria-label="anchor" href="#hypothesis-testing-for-covariate-coefficients"></a>
 </h3>
-<p>Additionally, we offer the <code><a href="../reference/summary_fe_covar.html">summary_fe_covar()</a></code> function, which provides the test statistics for the covariate coefficients. The test statistics can be calculated by the “wald test” (<code>"wald.cpp"</code> or <code>"wald"</code> option), “score test” (<code>"score"</code> option), or “likelihood ratio test” (<code>"lr"</code> option).</p>
+<p>Additionally, we offer the <code><a href="../reference/summary_fe_covar.html">summary_fe_covar()</a></code> function, which provides the test statistics for the covariate coefficients <span class="math inline">\(\beta\)</span>. The test statistics can be calculated by the “wald test” (use <code>"wald.cpp"</code> or <code>"wald"</code> option), “score test” (use <code>"score"</code> option), or “likelihood ratio test” (use <code>"lr"</code> option).</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/summary_fe_covar.html">summary_fe_covar</a></span><span class="op">(</span><span class="va">fit_fe</span><span class="op">)</span></span>
 <span><span class="co">#&gt;          beta   se.beta            p   CI.lower   CI.upper</span></span>

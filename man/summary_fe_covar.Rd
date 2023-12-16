@@ -7,17 +7,19 @@
 summary_fe_covar(fit, parm, level = 0.95, test = "wald.cpp", null = 0)
 }
 \arguments{
-\item{fit}{an object as output of \code{logis_fe} function}
+\item{fit}{an object as output of \code{logis_fe} function.}
 
-\item{parm}{a character vector specifies a subset of covariates}
+\item{parm}{a character vector specifies a subset of covariates. All covariates are included by default.}
 
-\item{level}{confidence level used for constructing confidence intervals. Defaulting to 0.95}
+\item{level}{confidence level used for constructing confidence intervals. Defaulting to 0.95.}
 
-\item{test}{a character string specifying the type of testing method, defaulting to "wald.cpp"
-* `wald`: wald test
-* `wald.cpp`: wald test using cpp function
-* `lr`: likelihood ratio test
-* `score`: score test}
+\item{test}{a character string specifying the type of testing method. Defaulting to "wald.cpp".
+\itemize{
+  \item "wald": wald test
+  \item "wald.cpp": wald test using cpp function
+  \item "lr": likelihood ratio test
+  \item "score": score test
+}}
 
 \item{null}{the null value of the covariate estimate that requires testing. (e.g. test \eqn{H_0: \beta = 0})}
 
@@ -31,7 +33,7 @@ Provide the Summary Statistics for Covariate Estimates
 }
 \examples{
 data(data_FE)
-data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID)
+data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID, message = FALSE)
 fit_fe <- logis_fe(data.prep)
 summary.wald.cpp <- summary_fe_covar(fit_fe, level = 0.05, test = "wald")
 summary.wald.cpp
