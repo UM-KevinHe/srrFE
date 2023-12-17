@@ -1,5 +1,5 @@
 #=== HYPOTHESIS TESTS FUNCTION =================================
-#' Hypothesis Tests for Identifying Outlying Providers
+#' Conduct hypothesis testing for identifying outlying providers
 #'
 #' @param fit an object as output of \code{logis_fe} function.
 #'

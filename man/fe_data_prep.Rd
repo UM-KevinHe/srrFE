@@ -2,7 +2,7 @@
 % Please edit documentation in R/fe_data_prep.R
 \name{fe_data_prep}
 \alias{fe_data_prep}
-\title{Data Preparation for Fixed Effects Modelling}
+\title{Data preparation before modelling}
 \usage{
 fe_data_prep(Y, Z, ID, cutoff = 10, check = TRUE, message = TRUE)
 }
@@ -27,7 +27,7 @@ fe_data_prep(Y, Z, ID, cutoff = 10, check = TRUE, message = TRUE)
 \item{char_list}{a list including variable names.}
 }
 \description{
-Data Preparation for Fixed Effects Modelling
+Data preparation before modelling
 }
 \details{
 Major steps in this stage include (in order):

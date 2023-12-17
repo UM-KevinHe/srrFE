@@ -2,7 +2,7 @@
 % Please edit documentation in R/coef.logis_fe.R
 \name{coef.logis_fe}
 \alias{coef.logis_fe}
-\title{Return the model coefficients of a \code{logis_fe} object}
+\title{Extract coefficients from a \code{logis_fe} object.}
 \usage{
 \method{coef}{logis_fe}(fit, ...)
 }
@@ -12,7 +12,7 @@
 \item{...}{}
 }
 \description{
-Return the model coefficients of a \code{logis_fe} object
+Extract coefficients from a \code{logis_fe} object.
 }
 \examples{
 data(data_FE)

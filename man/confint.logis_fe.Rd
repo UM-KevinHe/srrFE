@@ -2,7 +2,7 @@
 % Please edit documentation in R/confint.logis_fe.R
 \name{confint.logis_fe}
 \alias{confint.logis_fe}
-\title{Provide Confidence Interval for Provider effects or Standardization Ratios/Rates}
+\title{Provide confidence interval for provider effects or standardization ratios/rates}
 \usage{
 \method{confint}{logis_fe}(
   fit,
@@ -52,7 +52,7 @@
 A dataframe containing the point estimate, and lower and upper bounds of the estimate.
 }
 \description{
-Provide Confidence Interval for Provider effects or Standardization Ratios/Rates
+Provide confidence interval for provider effects or standardization ratios/rates
 }
 \examples{
 data(data_FE)

@@ -1,9 +1,12 @@
 url: https://um-kevinhe.github.io/srrFE/
 template:
-  params:
-    bootswatch: lumen
-    ganalytics: UA-54921687-5
-    mathjax: true
+  bootstrap: 5
+  bootswatch: lumen
+  bslib:
+    base_font: {google: "Roboto"}
+    heading_font: {google: "Roboto Slab"}
+    code_font: {google: "JetBrains Mono"}
+
 
 vignettes:
   - vignettes/srrFE.Rmd
@@ -28,25 +31,21 @@ navbar:
       href: articles/Articles.html
 
 reference:
-- title: Function for Data Preparation Function
+- title: Data Preparation
   contents:
   - fe_data_prep
-- title: Main Fitting Functions for Fixed Effects Models
-  desc: The main function for fitting the fixed effects model
+- title: Estimation
   contents:
   - logis_fe
-- title: Function for Providing Standardized Ratios/Rates
-  desc: The main function for fitting the fixed effects model
-  contents:
   - SR_output
-- title: Coefficient and Confidence Interval Functions
+- title: Coefficient and Confidence Interval
   contents:
   - coef.logis_fe
   - confint.logis_fe
-- title: Hypothesis Testing Functions
+- title: Hypothesis Testing
   contents:
   - test_fe
   - summary_fe_covar
-- title: Package Example Data Set
+- title: Example Data Set
   contents:
   - data_FE

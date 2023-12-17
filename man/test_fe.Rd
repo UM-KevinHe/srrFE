@@ -2,7 +2,7 @@
 % Please edit documentation in R/test_fe.R
 \name{test_fe}
 \alias{test_fe}
-\title{Hypothesis Tests for Identifying Outlying Providers}
+\title{Conduct hypothesis testing for identifying outlying providers}
 \usage{
 test_fe(
   fit,
@@ -44,7 +44,7 @@ a dataframe containing:
 \item{stat}{z-score}
 }
 \description{
-Hypothesis Tests for Identifying Outlying Providers
+Conduct hypothesis testing for identifying outlying providers
 }
 \details{
 By default, the function uses the "exact.poisbinom" method.

@@ -1,5 +1,5 @@
 #=== SUMMARY STATISTICS FOR COVARIATE ESTIMATES =================================
-#' Provide the Summary Statistics for Covariate Estimates
+#' Provide the summary statistics for covariate estimates
 #'
 #' @param fit an object as output of \code{logis_fe} function.
 #'

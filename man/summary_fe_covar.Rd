@@ -2,7 +2,7 @@
 % Please edit documentation in R/summary_fe_covar.R
 \name{summary_fe_covar}
 \alias{summary_fe_covar}
-\title{Provide the Summary Statistics for Covariate Estimates}
+\title{Provide the summary statistics for covariate estimates}
 \usage{
 summary_fe_covar(fit, parm, level = 0.95, test = "wald.cpp", null = 0)
 }
@@ -29,7 +29,7 @@ summary_fe_covar(fit, parm, level = 0.95, test = "wald.cpp", null = 0)
 a dataframe containing summary statistics for covariate estimates
 }
 \description{
-Provide the Summary Statistics for Covariate Estimates
+Provide the summary statistics for covariate estimates
 }
 \examples{
 data(data_FE)

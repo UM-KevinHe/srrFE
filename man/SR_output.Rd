@@ -2,7 +2,7 @@
 % Please edit documentation in R/SR_output.R
 \name{SR_output}
 \alias{SR_output}
-\title{Provide Outputs of Direct/indirect Standardization Ratio or Rate}
+\title{Provide direct/indirect standardization ratio or rate}
 \usage{
 SR_output(
   fit,
@@ -42,7 +42,7 @@ The return values depend on the user's choice of standardization method and meas
 \item{direct.rate}{a vector of standardization rate using direct method}
 }
 \description{
-Provide Outputs of Direct/indirect Standardization Ratio or Rate
+Provide direct/indirect standardization ratio or rate
 }
 \details{
 The "stdz" and "measure" arguments must be explicitly provided.

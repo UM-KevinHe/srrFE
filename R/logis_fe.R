@@ -1,5 +1,5 @@
 #=== FUNCTIONS FOR FITTING THE Fixed Effects MODEL =================================
-#' Main Function for Fitting Fixed Effects Model
+#' Main function for fitting fixed effects model
 #'
 #' @param data.prep an object from the `fe_data_prep()` function.
 #'

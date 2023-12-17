@@ -1,5 +1,5 @@
 #=== FUNCTIONS FOR EXTRACTING COEFFICIENTS =================================
-#' Return the model coefficients of a \code{logis_fe} object
+#' Extract coefficients from a \code{logis_fe} object.
 #'
 #' @param fit an object as output of \code{logis_fe} function.
 #'

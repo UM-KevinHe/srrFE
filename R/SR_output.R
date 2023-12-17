@@ -1,5 +1,5 @@
 #=== MEASURES OUTPUT FUNCTION =================================
-#' Provide Outputs of Direct/indirect Standardization Ratio or Rate
+#' Provide direct/indirect standardization ratio or rate
 #'
 #' @param fit an object as output of \code{logis_fe} function.
 #'

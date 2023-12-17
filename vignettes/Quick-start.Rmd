@@ -12,9 +12,11 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-
 ```{r, include = F}
-knitr::opts_chunk$set(eval = F, collapse = T, comment = NA)
+knitr::opts_chunk$set(
+  eval = F, 
+  collapse = T, 
+  comment = "#>")
 ```
 
 

@@ -3,7 +3,7 @@
 \docType{data}
 \name{data_FE}
 \alias{data_FE}
-\title{Example dataset for fixed effects model}
+\title{Example dataset}
 \format{
 A list containing the following elements:
 \describe{
@@ -20,7 +20,7 @@ A simulated data set containing response variable, provider information and 4 co
 }
 \examples{
 data(data_FE)
-head(data_FE$Y) 
+head(data_FE$Y)
 head(data_FE$ID)
 head(data_FE$Z)
 

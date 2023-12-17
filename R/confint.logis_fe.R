@@ -1,5 +1,5 @@
 #=== CONFIDENCE INTERVAL FUNCTION =================================
-#' Provide Confidence Interval for Provider effects or Standardization Ratios/Rates
+#' Provide confidence interval for provider effects or standardization ratios/rates
 #'
 #' @param fit an object as output of \code{logis_fe} function.
 #'

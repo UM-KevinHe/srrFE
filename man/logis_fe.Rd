@@ -2,7 +2,7 @@
 % Please edit documentation in R/logis_fe.R
 \name{logis_fe}
 \alias{logis_fe}
-\title{Main Function for Fitting Fixed Effects Model}
+\title{Main function for fitting fixed effects model}
 \usage{
 logis_fe(
   data.prep,
@@ -59,7 +59,7 @@ An object with S3 class \code{logis_fe}.
 \item{AUC}{area under the ROC curve}
 }
 \description{
-Main Function for Fitting Fixed Effects Model
+Main function for fitting fixed effects model
 }
 \details{
 The default algorithm is based on Serial blockwise inversion Newton (SerBIN) proposed by Wu et al. (2022),

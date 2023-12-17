@@ -1,5 +1,5 @@
 #=== FUNCTIONS FOR DATA PREPARATION FOR FIXED EFFECTS MODEL =================================
-#' Data Preparation for Fixed Effects Modelling
+#' Data preparation before modelling
 #'
 #' @param Y a numerical vector, with values of 0 or 1, indicating the outcome variable.
 #'
