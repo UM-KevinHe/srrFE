@@ -65,7 +65,7 @@ data(data_FE)
 
 ### Data Preparation Function
 
-Typically, users should employ the `fe_data_prep()` function to preprocess their data. We advise users to review the data and consider making adjustments based on the output information if necessary. (**Please know that the subsequent functions should be used based on this processed data**)
+Typically, users should employ the `fe_data_prep()` function to preprocess their data. We advise users to review the data and consider making adjustments based on the output information if necessary. (*Please know that the subsequent functions should be used based on this processed data*)
 
 ```{r}
 data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID)
