@@ -32,4 +32,3 @@ VignetteBuilder: knitr
 RoxygenNote: 7.2.3
 URL: https://github.com/UM-KevinHe/srrFE
 Encoding: UTF-8
-SystemRequirements: GNU make
