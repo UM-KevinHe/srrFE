@@ -3,16 +3,15 @@ Type: Package
 Title: GLM Model with Provider as Fixed Effects
 Version: 1.0
 Date: 2023-12-14
-Author: Wenbo Wu, Yubo Shao, Kevin He
-Maintainer: Yubo Shao <ybshao@umich.edu>
-Description: If a fixed effect model is applied to data involving 
-   large-scale providers, the default glm function in R utilizes 
-   the Newton-Raphson and Fisher scoring methods for updating objective 
-   functions. Consequently, the computational burden of inverting the Fisher 
-   information matrix becomes significantly high. This software package serves 
-   as an implementation of the SerBIN method proposed by Wu et al. (2022) 
-   <doi:10.1002/sim.9387>, addressing and mitigating the computational 
-   challenges associated with such large-scale provider data.
+Authors@R: c(
+   person("Yubo", "Shao", email = "ybshao@umich.edu", role = c("aut", "cre")),
+   person("Wenbo", "Wu", email = "Wenbo.Wu@nyulangone.org", role = "aut"),
+   person("Kevin", "He", email = "kevinhe@umich.edu", role = "aut"))
+Description: If a fixed effect model is applied to data involving large-scale providers, 
+   the default glm function will be unsuitable since the computational burden of inverting 
+   the Fisher information matrix becomes significantly high. This software package serves 
+   as an implementation of the SerBIN method proposed by Wu et al. (2022), addressing and 
+   mitigating the computational challenges associated with such large-scale provider data.
 License: GPL (>= 3)
 LazyData: true
 Imports:

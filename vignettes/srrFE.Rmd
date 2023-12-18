@@ -77,7 +77,7 @@ head(data.prep$data)
 The `logis_fe()` function is employed to fit the fixed effect model. In the first three argument positions of this function, users are required to supply the object generated from previous `fe_data_prep()` function.
 
 ```{r}
-fit_fe <- logis_fe(data.prep, message = T)
+fit_fe <- logis_fe(data.prep)
 ```
 
 Users most commonly utilize the output to obtain estimates of the facility effects and covariate coefficients by `coef()` function.

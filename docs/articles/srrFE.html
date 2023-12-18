@@ -77,7 +77,7 @@
       <img src="" class="logo" alt=""><h1>Getting Started with srrFE</h1>
                         <h4 data-toc-skip class="author">Yubo Shao</h4>
             
-            <h4 data-toc-skip class="date"><span style="font-style:normal;font-family:'Open Sans'">2023-12-16</span></h4>
+            <h4 data-toc-skip class="date"><span style="font-style:normal;font-family:'Open Sans'">2023-12-18</span></h4>
       
       <small class="dont-index">Source: <a href="https://github.com/UM-KevinHe/srrFE/blob/HEAD/vignettes/srrFE.Rmd" class="external-link"><code>vignettes/srrFE.Rmd</code></a></small>
       <div class="d-none name"><code>srrFE.Rmd</code></div>
@@ -125,7 +125,7 @@ body {
 <div class="section level3">
 <h3 id="data-preparation-function">Data Preparation Function<a class="anchor" aria-label="anchor" href="#data-preparation-function"></a>
 </h3>
-<p>Typically, users should employ the <code><a href="../reference/fe_data_prep.html">fe_data_prep()</a></code> function to preprocess their data. We advise users to review the data and consider making adjustments based on the output information if necessary. (<strong>Please know that the subsequent functions should be used based on this processed data</strong>)</p>
+<p>Typically, users should employ the <code><a href="../reference/fe_data_prep.html">fe_data_prep()</a></code> function to preprocess their data. We advise users to review the data and consider making adjustments based on the output information if necessary. (<em>Please know that the subsequent functions should be used based on this processed data</em>)</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data.prep</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fe_data_prep.html">fe_data_prep</a></span><span class="op">(</span><span class="va">data_FE</span><span class="op">$</span><span class="va">Y</span>, <span class="va">data_FE</span><span class="op">$</span><span class="va">Z</span>, <span class="va">data_FE</span><span class="op">$</span><span class="va">ID</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking missingness of variables ...</span></span>
@@ -154,7 +154,7 @@ body {
 </h3>
 <p>The <code><a href="../reference/logis_fe.html">logis_fe()</a></code> function is employed to fit the fixed effect model. In the first three argument positions of this function, users are required to supply the object generated from previous <code><a href="../reference/fe_data_prep.html">fe_data_prep()</a></code> function.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fit_fe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/logis_fe.html">logis_fe</a></span><span class="op">(</span><span class="va">data.prep</span>, message <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">fit_fe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/logis_fe.html">logis_fe</a></span><span class="op">(</span><span class="va">data.prep</span><span class="op">)</span></span></code></pre></div>
 <p>Users most commonly utilize the output to obtain estimates of the facility effects and covariate coefficients by <code><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef()</a></code> function.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">fit_fe</span><span class="op">)</span></span>
@@ -304,7 +304,7 @@ body {
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Yubo Shao.</p>
+<p>Developed by Yubo Shao, <a href="https://www.wenbowu.me/" class="external-link">Wenbo Wu</a>, <a href="https://www.um-kevinhe-group.org/" class="external-link">Kevin He</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -55,7 +55,7 @@
 #' @examples
 #' data(data_FE)
 #' data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID, message = FALSE)
-#' fit_fe <- logis_fe(data.prep, message = TRUE)
+#' fit_fe <- logis_fe(data.prep)
 #'
 #' @importFrom Rcpp evalCpp
 #' @importFrom pROC auc
