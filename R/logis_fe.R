@@ -29,9 +29,16 @@
 #'
 #' The default algorithm is based on Serial blockwise inversion Newton (SerBIN) proposed by Wu et al. (2022),
 #' but users can also choose to use the block ascent Newton (BAN) algorithm proposed by He et al. (2013) to fit the model.
+#' Both methodologies build upon the Newton-Raphson method, yet SerBIN simultaneously updates both the provider effect and covariate coefficient.
+#' This concurrent update necessitates the inversion of the complete information matrix at each iteration.
+#' In contrast, BAN adopts a two-layer updating approach, where the covariate coefficient is sequentially fixed to update the provider effect,
+#' followed by fixing the provider effect to update the covariate coefficient.
+#'
 #' We suggest using the default "SerBIN" option as it typically converges much faster for most datasets.
 #' However, in rare cases where the SerBIN algorithm encounters second-order derivative irreversibility leading to an error,
 #' users can consider using the "BAN" option as an alternative.
+#'
+#' For a deeper understanding, please consult the original article for detailed insights.
 #'
 #'
 #'
@@ -39,7 +46,7 @@
 #'
 #' \item{beta}{a vector of fixed effects estimates of covariates}
 #'
-#' \item{gamma}{a vector of estimates of facility effects}
+#' \item{gamma}{a vector of estimates of provider effects}
 #'
 #' \item{obs}{a vector of patients-level outcome}
 #'
@@ -65,7 +72,7 @@
 #' \item Wu, W, Yang, Y, Kang, J, He, K. (2022) Improving large-scale estimation and inference for profiling health care providers.
 #' \emph{Statistics in Medicine}, \strong{41(15)}: 2840-2853.
 #'
-#' \item He K, Kalbfleisch, J, Li, Y, and et al. (2013) Evaluating hospital readmission rates in dialysis facilities; adjusting for hospital effects.
+#' \item He K, Kalbfleisch, J, Li, Y, and et al. (2013) Evaluating hospital readmission rates in dialysis providers; adjusting for hospital effects.
 #' \emph{Lifetime Data Analysis}, \strong{19}: 490-512.
 #' }
 #'
@@ -76,7 +83,7 @@
 
 
 logis_fe <- function(data.prep, algorithm = "SerBIN", max.iter = 10000, tol = 1e-5, bound = 10,
-                     backtrack = FALSE, Rcpp = TRUE, AUC = FALSE, message = FALSE){ #BAN #SerBIN
+                     backtrack = FALSE, Rcpp = TRUE, AUC = FALSE, message = FALSE){
   if (missing(data.prep)) stop ("Argument 'data.prep' is required!", call.=F)
   if (!class(data.prep) %in% c("data_prep")) stop("Object 'data.prep' should be generated from 'fe_data_prep' function!", call.=F)
 
@@ -89,7 +96,7 @@ logis_fe <- function(data.prep, algorithm = "SerBIN", max.iter = 10000, tol = 1e
 
   data <- data[data$included==1,]
   n.prov <- sapply(split(data[, Y.char], data[, prov.char]), length) # provider-specific number of discharges
-  n.readm.prov <- sapply(split(data[, Y.char], data[, prov.char]), sum) # provider-specific number of readmissions
+  n.events.prov <- sapply(split(data[, Y.char], data[, prov.char]), sum) # provider-specific number of events
   Z <- as.matrix(data[,Z.char])
   gamma.prov <- rep(log(mean(data[,Y.char])/(1-mean(data[,Y.char]))), length(n.prov))
   beta <- rep(0, NCOL(Z))
@@ -276,13 +283,13 @@ logis_fe <- function(data.prep, algorithm = "SerBIN", max.iter = 10000, tol = 1e
   AIC <- neg2Loglkd + 2 * (length(gamma.prov)+length(beta))
   BIC <- neg2Loglkd + log(nrow(data)) * (length(gamma.prov)+length(beta))
 
-  df.prov <- data.frame(Obs_facility = sapply(split(data[,Y.char],data[,prov.char]),sum),
+  df.prov <- data.frame(Obs_provider = sapply(split(data[,Y.char],data[,prov.char]),sum),
                         gamma_est = gamma.prov) #original gamma-hat, for internal using
 
-  # modify "outlier facility"
-  if (sum(n.readm.prov==n.prov) != 0 | sum(n.readm.prov==0) != 0) {
-    gamma.prov[n.readm.prov==n.prov] <- Inf
-    gamma.prov[n.readm.prov==0] <- -Inf
+  # modify "outlier provider" to Inf or -Inf
+  if (sum(n.events.prov==n.prov) != 0 | sum(n.events.prov==0) != 0) {
+    gamma.prov[n.events.prov==n.prov] <- Inf
+    gamma.prov[n.events.prov==0] <- -Inf
   }
 
   #change output format
@@ -294,7 +301,7 @@ logis_fe <- function(data.prep, algorithm = "SerBIN", max.iter = 10000, tol = 1e
   char_list <- data.prep$char_list
 
   return_ls <- structure(list(beta = beta,
-                              gamma = gamma.prov, #facility effect
+                              gamma = gamma.prov, #provider effect
                               obs = data[, Y.char], #patient-level obs
                               neg2Loglkd = neg2Loglkd,
                               AIC = AIC,

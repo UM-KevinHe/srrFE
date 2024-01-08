@@ -54,7 +54,7 @@ We will employ a simulated dataset contained in the current package to illustrat
 
 * Y: the binary outcome variable
 
-* ID: facility indicator
+* ID: provider identifiers
 
 * Z: 4 continuous covariates
 
@@ -80,7 +80,7 @@ The `logis_fe()` function is employed to fit the fixed effect model. In the firs
 fit_fe <- logis_fe(data.prep)
 ```
 
-Users most commonly utilize the output to obtain estimates of the facility effects and covariate coefficients by `coef()` function.
+Users most commonly utilize the output to obtain estimates of the provider effects and covariate coefficients by `coef()` function.
 
 ```{r}
 coef(fit_fe)
@@ -96,15 +96,15 @@ SR$indirect.rate
 SR$indirect.ratio
 ```
 
-### Hypothesis Testing for Facility Effects
+### Hypothesis Testing for Provider Effects
 
-The `test_fe()` function provides hypothesis testing outcomes to assist users in identifying outlier facilities with extreme outcomes.
+The `test_fe()` function provides hypothesis testing outcomes to assist users in identifying outlier providers with extreme outcomes.
 
 ```{r}
 test_poisbinom <- test_fe(fit_fe)
 test_poisbinom
 ```
-The function returns a 3-column dataframe, with the "flag" column indicating whether a facility is flagged (where 0 denotes that the facility is not flagged, and 1 or -1 represents outlier facilities based on the user's data interpretation). The last two columns contain p-values and their corresponding test statistics.
+The function returns a 3-column dataframe, with the "flag" column indicating whether a provider is flagged (where 0 denotes that the provider is not flagged, and 1 or -1 represents outlier providers based on the user's data interpretation). The last two columns contain p-values and their corresponding test statistics.
 
 ### Hypothesis Testing for Covariate Coefficients
 
@@ -117,9 +117,9 @@ summary_fe_covar(fit_fe)
 
 The returned dataframe includes the estimates of the covariate coefficients and their corresponding p-values. Furthermore, the Wald test offers additional confidence intervals.
 
-### Confidence Interval for Facility Effects
+### Confidence Interval for Provider Effects
 
-The `confint()` function can be used to provide the confidence intervals for the facility effects (i.e. $\gamma_i$) for each facilities selected to be tested. User needs to explicitly specify `option = "gamma"`.
+The `confint()` function can be used to provide the confidence intervals for the provider effects (i.e. $\gamma_i$) for each providers selected to be tested. User needs to explicitly specify `option = "gamma"`.
 
 Users can choose the method for generating confidence intervals from either `"exact"`, `"wald"`, or `"score"` test. To maintain consistency between the confidence interval (CI) and the previous test results, it is advisable to use the same test option for both the `test_fe()` and `confint()` functions. Please note that the `"exact"` option in the `test_fe()` function corresponds to the `"exact.poisbinom"` option in the `test_fe()` function.
 
@@ -127,7 +127,7 @@ Users can choose the method for generating confidence intervals from either `"ex
 confint(fit_fe, option = "gamma")
 ```
 
-The returned data frame offers estimates of the facility effects, and both upper and lower limits of the CIs (defaulting to a 95% confidence level on both sides).
+The returned data frame offers estimates of the provider effects, and both upper and lower limits of the CIs (defaulting to a 95% confidence level on both sides).
 
 
 ### Confidence Interval for Measures

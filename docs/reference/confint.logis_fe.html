@@ -139,19 +139,32 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8   0.304527080  -0.7020479   1.3619158</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 9   1.727970674   0.6661555   2.7870210</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10 -0.034881361  -0.9473625   0.8875052</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">fit_fe</span>, option <span class="op">=</span> <span class="st">"SR"</span>, stdz <span class="op">=</span> <span class="st">"direct"</span>, measure <span class="op">=</span> <span class="st">"rate"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $CI.direct_rate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    direct_rate CI_rate.lower CI_rate.upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     49.27094      41.72223      56.88122</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2     56.46127      48.11855      64.72792</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3     37.79631      29.60944      45.93492</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4     71.31486      62.38719      79.32001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5     52.11158      43.50198      60.86772</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6     45.94477      37.14172      54.44656</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7     49.81051      41.81677      57.56939</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8     52.38627      43.65346      61.57397</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9     64.71905      55.53493      73.46444</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10    49.43288      41.54713      57.46074</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">fit_fe</span>, option <span class="op">=</span> <span class="st">"SR"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $CI.indirect_ratio</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    indirect_ratio CI_ratio.lower CI_ratio.upper</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       0.9519563      0.7366397      1.1667814</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       1.1043247      0.9460707      1.2635985</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       0.6849708      0.5249067      0.8728793</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4       1.2706751      1.1431082      1.3991743</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5       1.0179583      0.8787492      1.1516614</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6       0.8865274      0.7124129      1.0871900</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7       0.9653378      0.7435250      1.2105744</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8       1.0212087      0.8785469      1.1463036</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9       1.1944943      1.0654148      1.3240740</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10      0.9690691      0.8066190      1.1268870</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $CI.indirect_rate</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    indirect_rate CI_rate.lower CI_rate.upper</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       49.50173      38.30527      60.67263</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       57.42488      49.19568      65.70712</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       35.61848      27.29515      45.38972</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4       66.07510      59.44163      72.75706</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5       52.93383      45.69496      59.88639</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6       46.09943      37.04547      56.53388</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7       50.19757      38.66330      62.94987</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8       53.10285      45.68444      59.60779</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9       62.11370      55.40157      68.85185</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10      50.39159      41.94419      58.59812</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

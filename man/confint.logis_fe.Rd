@@ -59,6 +59,6 @@ data(data_FE)
 data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID, message = FALSE)
 fit_fe <- logis_fe(data.prep)
 confint(fit_fe, option = "gamma")
-confint(fit_fe, option = "SR", stdz = "direct", measure = "rate")
+confint(fit_fe, option = "SR")
 
 }

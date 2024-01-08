@@ -72,12 +72,15 @@
   </div>
 </nav><div class="container template-article">
 
+
+
+
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Quick Start</h1>
                         <h4 data-toc-skip class="author">Yubo Shao</h4>
             
-            <h4 data-toc-skip class="date"><span style="font-style:normal;font-family:'Open Sans'">2023-12-18</span></h4>
+            <h4 data-toc-skip class="date"><span style="font-style:normal;font-family:'Open Sans'">2024-01-08</span></h4>
       
       <small class="dont-index">Source: <a href="https://github.com/UM-KevinHe/srrFE/blob/HEAD/vignettes/Quick-start.Rmd" class="external-link"><code>vignettes/Quick-start.Rmd</code></a></small>
       <div class="d-none name"><code>Quick-start.Rmd</code></div>
@@ -85,14 +88,18 @@
 
     
     
-<p>This document serves as a quick guide for getting started with the fundamental usage of this package.</p>
+<p>This document serves as a quick guide for getting started with the
+fundamental usage of this package.</p>
 <div class="section level3">
 <h3 id="data-preparation">1. Data preparation<a class="anchor" aria-label="anchor" href="#data-preparation"></a>
 </h3>
-<p>If your have distinct data sets for the outcome (Y), covariate matrix (Z), and provider indicator (ID), you can directly execute the subsequent code to do the data preparation.</p>
+<p>If your have distinct data sets for the outcome (Y), covariate matrix
+(Z), and provider identifiers (ID), you can directly execute the
+subsequent code to do the data preparation.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data.prep</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fe_data_prep.html">fe_data_prep</a></span><span class="op">(</span><span class="va">Y</span>, <span class="va">Z</span>, <span class="va">ID</span><span class="op">)</span></span></code></pre></div>
-<p>Otherwise you can split the data by specifying the variable names as follows:</p>
+<p>Otherwise you can split the data by specifying the variable names as
+follows:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Y.char</span> <span class="op">&lt;-</span> <span class="st">"Y"</span> <span class="co">#example variable name for outcome in your dataset</span></span>
 <span><span class="va">Z.char</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"gender"</span>, <span class="st">"edu"</span>, <span class="va">...</span><span class="op">)</span> <span class="co">#example variable names for predictors in your dataset</span></span>
@@ -120,7 +127,7 @@
 <span><span class="va">SR</span><span class="op">$</span><span class="va">indirect.rate</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="testing-to-find-the-outlier-facilities">2.3 Testing to find the outlier facilities<a class="anchor" aria-label="anchor" href="#testing-to-find-the-outlier-facilities"></a>
+<h3 id="testing-to-find-the-outlier-providers">2.3 Testing to find the outlier providers<a class="anchor" aria-label="anchor" href="#testing-to-find-the-outlier-providers"></a>
 </h3>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/test_fe.html">test_fe</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></code></pre></div>
@@ -132,7 +139,8 @@
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">fit</span>, option <span class="op">=</span> <span class="st">"gamma"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="obtain-the-confidence-interval-of-indirect-standardized-ratiorate">2.5 Obtain the confidence interval of indirect standardized ratio/rate<a class="anchor" aria-label="anchor" href="#obtain-the-confidence-interval-of-indirect-standardized-ratiorate"></a>
+<h3 id="obtain-the-confidence-interval-of-indirect-standardized-ratiorate">2.5 Obtain the confidence interval of indirect standardized
+ratio/rate<a class="anchor" aria-label="anchor" href="#obtain-the-confidence-interval-of-indirect-standardized-ratiorate"></a>
 </h3>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">fit</span>, option <span class="op">=</span> <span class="st">"SR"</span><span class="op">)</span></span></code></pre></div>

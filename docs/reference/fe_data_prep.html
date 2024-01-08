@@ -78,7 +78,7 @@
 
 
 <dt>cutoff</dt>
-<dd><p>an integer as cutoff of provider size with 10 as default. Facilities with observations fewer than the "cutoff" value will be labeled as "include = 0".</p></dd>
+<dd><p>an integer as cutoff of provider size with 10 as default. Providers with observations fewer than the "cutoff" value will be labeled as "include = 0".</p></dd>
 
 
 <dt>check</dt>
@@ -96,7 +96,7 @@
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <dl><dt>data</dt>
-<dd><p>a data frame including response, provider ID, and covariates</p></dd>
+<dd><p>a sorted data frame including response, provider identifiers, covariates, and additional provider information.</p></dd>
 
 
 <dt>char_list</dt>
@@ -106,14 +106,18 @@
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Major steps in this stage include (in order):</p><ul><li><p>checking missingness, variation, correlation and VIF of variables in the data,</p></li>
-<li><p>provider screening based on number of discharges, 10 as default,</p></li>
-<li><p>calculating the total number of facilities and hospitals,</p></li>
-<li><p>reporting proportions of facilities with no readmission within 30 days, and with all readmission within 30 days after discharge,</p></li>
-<li><p>modifying responses to prevent infinite log-likelihoods during model fitting, and</p></li>
-<li><p>sorting data by hospital and provider identifiers.</p></li>
-</ul><p>The `fe_data_prep()` function not only returns the original data sorted by provider identifiers,
-but also outputs vectors that indicate whether the provider has zero or all readmissions, and
-a dataframe combines all the output information is also provided.</p>
+<li><p>provider screening based on the provider size, 10 as default,</p></li>
+<li><p>reporting proportions of providers with no events (i.e. all "0" outcomes) and with all events (i.e. all "1" outcomes),</p></li>
+<li><p>sorting data by provider identifiers.</p></li>
+</ul><p>The `fe_data_prep()` function returns data sorted by the provider identifiers,
+accompanied by additional provider-related information indicating whether the provider's size exceeds a specified "cutoff"
+and whether the respective provider has experienced either zero or all events.
+The reason behind introducing a "cutoff" lies in findings from both simulated and real data studies,
+revealing the instability of coefficient estimates for providers with small sizes.
+Consequently, we strongly recommend excluding small providers during the model fitting process.
+It is important to note that the resultant data frame retains all providers, including small ones,
+but utilizes the "included = 0" label to signify the small providers. Subsequently, during the model fitting stage,
+the `logis_fe()` function disregards records marked with "included = 0".</p>
     </div>
 
     <div class="section level2">
@@ -129,17 +133,17 @@ a dataframe combines all the output information is also provided.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking VIF of covariates ... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking VIF of covariates completed!</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>0 out of 10 providers considered small and filtered out!</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0 out of 10 remaining providers with no readmission within 30 days.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 0 out of 10 remaining providers with all readmissions within 30 days.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> After screening, 52% of all discharges were readmitted within 30 days.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 0 out of 10 remaining providers with no events.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 0 out of 10 remaining providers with all events.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> After screening, 52% of all records exhibit occurrences of events (Y = 1)</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data.prep</span><span class="op">$</span><span class="va">data</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Y ID      Z1      Z2      Z3      Z4 included no.readm all.readm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38 1  1 -0.7124  0.3953 -0.8402  0.0840        1        0         0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  0  1  0.3660 -0.7654  1.8015 -0.5231        1        0         0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0  1 -0.0715  0.3307 -0.1121 -0.3115        1        0         0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 32 1  1  1.2804 -0.7822  0.0941  0.7869        1        0         0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 34 0  1  0.4012 -0.5114  0.3514 -0.8059        1        0         0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 23 0  1  0.8727 -0.7320 -0.2893 -0.0106        1        0         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Y ID      Z1      Z2      Z3      Z4 included no.events all.events</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 38 1  1 -0.7124  0.3953 -0.8402  0.0840        1         0          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  0  1  0.3660 -0.7654  1.8015 -0.5231        1         0          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0  1 -0.0715  0.3307 -0.1121 -0.3115        1         0          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 32 1  1  1.2804 -0.7822  0.0941  0.7869        1         0          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 34 0  1  0.4012 -0.5114  0.3514 -0.8059        1         0          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23 0  1  0.8727 -0.7320 -0.2893 -0.0106        1         0          0</span>
 <span class="r-in"><span><span class="va">data.prep</span><span class="op">$</span><span class="va">char_list</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $Y.char</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Y"</span>

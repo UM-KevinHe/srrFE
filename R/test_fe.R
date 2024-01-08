@@ -31,7 +31,7 @@
 #'
 #' @return a dataframe containing:
 #'
-#' \item{flag}{a vector of flagging indicator. "1" means better, and "-1" means worse}
+#' \item{flag}{a vector of flagging indicator. "1" means statistically higher than null, and "-1" means statistically lower than null}
 #'
 #' \item{p}{p-value}
 #'
@@ -67,7 +67,7 @@ test_fe <- function(fit, parm, level = 0.95, test = "exact.poisbinom", null = "m
   Y.char <- fit$char_list$Y.char
   Z.char <- fit$char_list$Z.char
   prov.char <- fit$char_list$prov.char
-  data <- fit$data_include[, c(Y.char, Z.char, prov.char)] #already sorted by facility ID
+  data <- fit$data_include[, c(Y.char, Z.char, prov.char)] #already sorted by provider ID
 
   gamma <- fit$df.prov$gamma_est #not use the potential Inf of gamma here
   beta <- fit$beta
@@ -132,11 +132,11 @@ test_fe <- function(fit, parm, level = 0.95, test = "exact.poisbinom", null = "m
   } else if (test=="wald") { # invalid in presence of outlying providers
     if(!missing(parm)){
       if (sum(!is.finite(gamma[indices])) != 0){
-        stop("wald test cannot be performed on facilities with zero or all readmissions!!")
+        stop("wald test cannot be performed on providers with zero or all events!!")
       }
     } else {
       if (sum(!is.finite(gamma)) != 0){
-        stop("wald test cannot be performed on facilities with zero or all readmissions!!")
+        stop("wald test cannot be performed on providers with zero or all events!!")
       }
     }
 

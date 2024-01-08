@@ -72,7 +72,7 @@ SR_output <- function(fit, stdz = "indirect", measure = c("rate", "ratio"), null
   data <- fit$data_include
 
   n.prov <- sapply(split(data[, Y.char], data[, prov.char]), length) # provider-specific number of discharges
-  n.readm.prov <- sapply(split(data[, Y.char], data[, prov.char]), sum) # provider-specific number of readmissions
+  n.events.prov <- sapply(split(data[, Y.char], data[, prov.char]), sum) # provider-specific number of events
   Z <- as.matrix(data[,Z.char])
   gamma.prov <- fit$gamma
   beta <- fit$beta
@@ -83,13 +83,13 @@ SR_output <- function(fit, stdz = "indirect", measure = c("rate", "ratio"), null
     gamma.null <- ifelse(null=="median", median(gamma.prov),
                          ifelse(class(null)=="numeric", null[1],
                                 stop("Argument 'null' NOT as required!",call.=F)))
-    Exp <- as.numeric(plogis(gamma.null+Z%*%beta)) # expected prob of readm within 30 days of discharge under null
+    Exp <- as.numeric(plogis(gamma.null+Z%*%beta)) # expected prob of events under null
 
-    df.prov <- data.frame(Obs_facility = sapply(split(data[,Y.char],data[,prov.char]),sum),
-                          Exp.indirect_facility = sapply(split(Exp,data[,prov.char]),sum))
+    df.prov <- data.frame(Obs_provider = sapply(split(data[,Y.char],data[,prov.char]),sum),
+                          Exp.indirect_provider = sapply(split(Exp,data[,prov.char]),sum))
     OE_indirect <- df.prov
 
-    df.prov$IS_Ratio <- df.prov$Obs_facility / df.prov$Exp.indirect_facility #indirect standardized ratio: O_i/E_i
+    df.prov$IS_Ratio <- df.prov$Obs_provider / df.prov$Exp.indirect_provider #indirect standardized ratio: O_i/E_i
     df.prov$IS_Rate <- pmax(pmin(df.prov$IS_Ratio * population_rate, 100), 0)  #restricted to 0%-100%
 
     indirect_stdz.ratio <- matrix(df.prov$IS_Ratio) #output measure
@@ -116,16 +116,16 @@ SR_output <- function(fit, stdz = "indirect", measure = c("rate", "ratio"), null
   }
 
 
-  # modify "outlier facility"
-  if (sum(n.readm.prov==n.prov) != 0 | sum(n.readm.prov==0) != 0) {
+  # modify "outlier provider"
+  if (sum(n.events.prov==n.prov) != 0 | sum(n.events.prov==0) != 0) {
     if ("direct" %in% stdz) { #only "direct standardized rates/ratios" are affected
       if ("ratio" %in% measure){
-        direct_stdz.ratio[n.readm.prov==n.prov,] <- length(gamma.obs) / sum(df.prov$Obs)
-        direct_stdz.ratio[n.readm.prov==0,] <- 0
+        direct_stdz.ratio[n.events.prov==n.prov,] <- length(gamma.obs) / sum(df.prov$Obs)
+        direct_stdz.ratio[n.events.prov==0,] <- 0
       }
       if ("rate" %in% measure){
-        direct_stdz.rate[n.readm.prov==n.prov,] <- 1
-        direct_stdz.rate[n.readm.prov==0,] <- 0
+        direct_stdz.rate[n.events.prov==n.prov,] <- 1
+        direct_stdz.rate[n.events.prov==0,] <- 0
       }
     }
   }

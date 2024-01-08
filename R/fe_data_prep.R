@@ -7,7 +7,7 @@
 #'
 #' @param ID a vector representing the provider id. Its elements can be either numeric values or characters.
 #'
-#' @param cutoff an integer as cutoff of provider size with 10 as default. Facilities with observations fewer than the "cutoff" value will be labeled as "include = 0".
+#' @param cutoff an integer as cutoff of provider size with 10 as default. Providers with observations fewer than the "cutoff" value will be labeled as "include = 0".
 #'
 #' @param check a Boolean indicating whether checking missingness, variation, correlation and VIF of variables in the data. Defaulting to "TRUE".
 #'
@@ -20,22 +20,25 @@
 #' Major steps in this stage include (in order):
 #'   \itemize{
 #'   \item checking missingness, variation, correlation and VIF of variables in the data,
-#'   \item provider screening based on number of discharges, 10 as default,
-#'   \item calculating the total number of facilities and hospitals,
-#'   \item reporting proportions of facilities with no readmission within 30 days, and with all readmission within 30 days after discharge,
-#'   \item modifying responses to prevent infinite log-likelihoods during model fitting, and
-#'   \item sorting data by hospital and provider identifiers.
+#'   \item provider screening based on the provider size, 10 as default,
+#'   \item reporting proportions of providers with no events (i.e. all "0" outcomes) and with all events (i.e. all "1" outcomes),
+#'   \item sorting data by provider identifiers.
 #'   }
 #'
-#'
-#' The `fe_data_prep()` function not only returns the original data sorted by provider identifiers,
-#' but also outputs vectors that indicate whether the provider has zero or all readmissions, and
-#' a dataframe combines all the output information is also provided.
+#' The `fe_data_prep()` function returns data sorted by the provider identifiers,
+#' accompanied by additional provider-related information indicating whether the provider's size exceeds a specified "cutoff"
+#' and whether the respective provider has experienced either zero or all events.
+#' The reason behind introducing a "cutoff" lies in findings from both simulated and real data studies,
+#' revealing the instability of coefficient estimates for providers with small sizes.
+#' Consequently, we strongly recommend excluding small providers during the model fitting process.
+#' It is important to note that the resultant data frame retains all providers, including small ones,
+#' but utilizes the "included = 0" label to signify the small providers. Subsequently, during the model fitting stage,
+#' the `logis_fe()` function disregards records marked with "included = 0".
 #'
 #'
 #' @return
 #'
-#' \item{data}{a data frame including response, provider ID, and covariates}
+#' \item{data}{a sorted data frame including response, provider identifiers, covariates, and additional provider information.}
 #'
 #' \item{char_list}{a list including variable names.}
 #'
@@ -123,21 +126,23 @@ fe_data_prep <- function(Y, Z, ID, cutoff = 10, check = TRUE, message = TRUE) {
   data$included <- 1 * (prov.size.long > cutoff) # create variable 'included' as an indicator
   if (message == TRUE) warning(sum(prov.size<=cutoff)," out of ",length(prov.size),
           " providers considered small and filtered out!",immediate.=T,call.=F)
+
+
   prov.list <- unique(data[data$included==1,prov.char])   # a reduced list of provider IDs
-  prov.no.readm <-      # providers with no readmission within 30 days
+  prov.no.events <-      # providers with no events
     prov.list[sapply(split(data[data$included==1,Y.char], factor(data[data$included==1,prov.char])),sum)==0]
-  data$no.readm <- 0
-  data$no.readm[data[,prov.char]%in%c(prov.no.readm)] <- 1
-  if (message == TRUE) message(paste(length(prov.no.readm),"out of",length(prov.list),
-                "remaining providers with no readmission within 30 days."))
-  prov.all.readm <-     # providers with all readmissions within 30 days
+  data$no.events <- 0
+  data$no.events[data[,prov.char]%in%c(prov.no.events)] <- 1
+  if (message == TRUE) message(paste(length(prov.no.events),"out of",length(prov.list),
+                "remaining providers with no events."))
+  prov.all.events <-     # providers with all events
     prov.list[sapply(split(1-data[data$included==1,Y.char],factor(data[data$included==1,prov.char])),sum)==0]
-  data$all.readm <- 0
-  data$all.readm[data[,prov.char]%in%c(prov.all.readm)] <- 1
-  if (message == TRUE) message(paste(length(prov.all.readm),"out of",length(prov.list),
-                "remaining providers with all readmissions within 30 days."))
+  data$all.events <- 0
+  data$all.events[data[,prov.char]%in%c(prov.all.events)] <- 1
+  if (message == TRUE) message(paste(length(prov.all.events),"out of",length(prov.list),
+                "remaining providers with all events."))
   if (message == TRUE) message(paste0("After screening, ", round(sum(data[data$included==1,Y.char])/length(data[data$included==1,Y.char])*100,2),
-                 "% of all discharges were readmitted within 30 days."))
+                 "% of all records exhibit occurrences of events (Y = 1)"))
 
 
   char_list <- list(Y.char = Y.char,

@@ -24,7 +24,7 @@ This document serves as a quick guide for getting started with the fundamental u
 
 ### 1. Data preparation
 
-If your have distinct data sets for the outcome (Y), covariate matrix (Z), and provider indicator (ID), you can directly execute the subsequent code to do the data preparation.
+If your have distinct data sets for the outcome (Y), covariate matrix (Z), and provider identifiers (ID), you can directly execute the subsequent code to do the data preparation.
 ```{r}
 data.prep <- fe_data_prep(Y, Z, ID)
 ```
@@ -56,7 +56,7 @@ SR$indirect.ratio
 SR$indirect.rate
 ```
 
-### 2.3 Testing to find the outlier facilities
+### 2.3 Testing to find the outlier providers
 ```{r}
 test_fe(fit)
 ```

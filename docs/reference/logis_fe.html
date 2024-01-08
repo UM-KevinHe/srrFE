@@ -127,7 +127,7 @@
 
 
 <dt>gamma</dt>
-<dd><p>a vector of estimates of facility effects</p></dd>
+<dd><p>a vector of estimates of provider effects</p></dd>
 
 
 <dt>obs</dt>
@@ -154,16 +154,21 @@
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The default algorithm is based on Serial blockwise inversion Newton (SerBIN) proposed by Wu et al. (2022),
 but users can also choose to use the block ascent Newton (BAN) algorithm proposed by He et al. (2013) to fit the model.
-We suggest using the default "SerBIN" option as it typically converges much faster for most datasets.
+Both methodologies build upon the Newton-Raphson method, yet SerBIN simultaneously updates both the provider effect and covariate coefficient.
+This concurrent update necessitates the inversion of the complete information matrix at each iteration.
+In contrast, BAN adopts a two-layer updating approach, where the covariate coefficient is sequentially fixed to update the provider effect,
+followed by fixing the provider effect to update the covariate coefficient.</p>
+<p>We suggest using the default "SerBIN" option as it typically converges much faster for most datasets.
 However, in rare cases where the SerBIN algorithm encounters second-order derivative irreversibility leading to an error,
 users can consider using the "BAN" option as an alternative.</p>
+<p>For a deeper understanding, please consult the original article for detailed insights.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     
 <ul><li><p>Wu, W, Yang, Y, Kang, J, He, K. (2022) Improving large-scale estimation and inference for profiling health care providers.
 <em>Statistics in Medicine</em>, <strong>41(15)</strong>: 2840-2853.</p></li>
-<li><p>He K, Kalbfleisch, J, Li, Y, and et al. (2013) Evaluating hospital readmission rates in dialysis facilities; adjusting for hospital effects.
+<li><p>He K, Kalbfleisch, J, Li, Y, and et al. (2013) Evaluating hospital readmission rates in dialysis providers; adjusting for hospital effects.
 <em>Lifetime Data Analysis</em>, <strong>19</strong>: 490-512.</p></li>
 </ul></div>
 

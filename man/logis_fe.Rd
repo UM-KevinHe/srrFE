@@ -46,7 +46,7 @@ An object with S3 class \code{logis_fe}.
 
 \item{beta}{a vector of fixed effects estimates of covariates}
 
-\item{gamma}{a vector of estimates of facility effects}
+\item{gamma}{a vector of estimates of provider effects}
 
 \item{obs}{a vector of patients-level outcome}
 
@@ -64,9 +64,16 @@ Main function for fitting fixed effects model
 \details{
 The default algorithm is based on Serial blockwise inversion Newton (SerBIN) proposed by Wu et al. (2022),
 but users can also choose to use the block ascent Newton (BAN) algorithm proposed by He et al. (2013) to fit the model.
+Both methodologies build upon the Newton-Raphson method, yet SerBIN simultaneously updates both the provider effect and covariate coefficient.
+This concurrent update necessitates the inversion of the complete information matrix at each iteration.
+In contrast, BAN adopts a two-layer updating approach, where the covariate coefficient is sequentially fixed to update the provider effect,
+followed by fixing the provider effect to update the covariate coefficient.
+
 We suggest using the default "SerBIN" option as it typically converges much faster for most datasets.
 However, in rare cases where the SerBIN algorithm encounters second-order derivative irreversibility leading to an error,
 users can consider using the "BAN" option as an alternative.
+
+For a deeper understanding, please consult the original article for detailed insights.
 }
 \examples{
 data(data_FE)
@@ -79,7 +86,7 @@ fit_fe <- logis_fe(data.prep)
 \item Wu, W, Yang, Y, Kang, J, He, K. (2022) Improving large-scale estimation and inference for profiling health care providers.
 \emph{Statistics in Medicine}, \strong{41(15)}: 2840-2853.
 
-\item He K, Kalbfleisch, J, Li, Y, and et al. (2013) Evaluating hospital readmission rates in dialysis facilities; adjusting for hospital effects.
+\item He K, Kalbfleisch, J, Li, Y, and et al. (2013) Evaluating hospital readmission rates in dialysis providers; adjusting for hospital effects.
 \emph{Lifetime Data Analysis}, \strong{19}: 490-512.
 }
 }
