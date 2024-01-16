@@ -30,7 +30,7 @@
 #' and whether the respective provider has experienced either zero or all events.
 #' The reason behind introducing a "cutoff" lies in findings from both simulated and real data studies,
 #' revealing the instability of coefficient estimates for providers with small sizes.
-#' Consequently, we strongly recommend excluding small providers during the model fitting process.
+#' Consequently, we recommend excluding small providers during the model fitting process.
 #' It is important to note that the resultant data frame retains all providers, including small ones,
 #' but utilizes the "included = 0" label to signify the small providers. Subsequently, during the model fitting stage,
 #' the `logis_fe()` function disregards records marked with "included = 0".

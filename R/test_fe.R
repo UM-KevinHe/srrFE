@@ -31,7 +31,8 @@
 #'
 #' @return a dataframe containing:
 #'
-#' \item{flag}{a vector of flagging indicator. "1" means statistically higher than null, and "-1" means statistically lower than null}
+#' \item{flag}{a vector of flagging indicator. "1" means statistically higher than expected,
+#' and "-1" means statistically lower than expected}
 #'
 #' \item{p}{p-value}
 #'

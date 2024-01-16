@@ -50,15 +50,17 @@ In addition to the outputs for covariate coefficients and provider effects, user
 
 $$ISR_i = \frac{O_i}{E_i},$$ where $O_i = \sum_{j = 1}^{n_i} Y_{ij}$ is the observed number of events for provider $i$, and $E_i$ is the "expected" number of events for provider $i$, calculated as $E_i = \sum_{j = 1}^{n_i} \frac{e^{\gamma_0 + Z_{ij}\boldsymbol{\beta}}}{1 + e^{\gamma_0 + Z_{ij}\boldsymbol{\beta}}}$. Here, $\gamma_0$ represents the "population average", defaulting to the median value of all $\hat{\gamma}_i$'s. 
 
-In the context of indirect standardization, the interpretation of $E_i$ can be expressed as follows: "If all the records associated with provider $i$ opted for treatment from the null provider, what would be the expected number of events?". An $ISR_i >1$ indicates that provider $i$ has worse performance than the null provider.
+In the context of indirect standardization, the interpretation of $E_i$ can be expressed as follows: "What would be the expected number of events of provider $i$, if provider $i$ performs at the national average level?" (see [He and Schaubel. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4190619/) and [Jones, Ohlssen, and Sprigelhalter. (2008)](https://www.sciencedirect.com/science/article/pii/S0895435607002119?via%3Dihub) ). An $ISR_i >1$ indicates that provider $i$'s observed event rate is higher than expected based on the national average.
 
 * **Direct standardization ratio (DSR)** is determined by the formula:
 
-$${DSR}_k = \frac{E_k}{O},$$ where $O = \sum_{i = 1}^m \sum_{j = 1}^{n_i} Y_{ij}$, and $E_{k} = \sum_{i = 1}^m \sum_{j = 1}^{n_i} \frac{e^{\hat{\gamma}_k + Z_{ij}\boldsymbol{\beta}}}{1 + e^{\hat{\gamma}_k + Z_{ij}\boldsymbol{\beta}}}$. 
+$${DSR}_k = \frac{E^{(k)}}{O},$$ where $O = \sum_{i = 1}^m \sum_{j = 1}^{n_i} Y_{ij}$, and $E^{(k)} = \sum_{i = 1}^m \sum_{j = 1}^{n_i} \frac{e^{\hat{\gamma}_k + Z_{ij}\boldsymbol{\beta}}}{1 + e^{\hat{\gamma}_k + Z_{ij}\boldsymbol{\beta}}}$. 
 
-In the context of direct standardization, the understanding of $E_k$ can be articulated as follows: "If all the records in the dataset chose treatment from provider $k$, what would be the expected number of total events?". If $\hat{\gamma}_k = \infty$, $E_{k} = N$, resulting in ${DSR}_{k} = \frac{N}{O}$; and if $\hat{\gamma}_k = -\infty$, $E^{(k)} = 0$, leading to ${DSR}_{k} = 0$.
+In the context of direct standardization, the understanding of $E^{(k)}$ can be articulated as follows: "What would be the expected number of total events, if all providers performs as provider $k$?". 
 
-Users also have the option to request the function to generate a "standardized rate", which is computed as $ISR_i$ or $DSR_i \times \frac{O}{N}$. 
+If $\hat{\gamma}_k = \infty$, $E^{(k)} = N$, resulting in ${DSR}_{k} = \frac{N}{O}$; and if $\hat{\gamma}_k = -\infty$, $E^{(k)} = 0$, leading to ${DSR}_{k} = 0$. 
+
+Users also have the option to request the function to generate a "standardized rate", which is computed as $ISR_i$ or $DSR_k \times \frac{O}{N}$. 
 
 *(Please be aware that the computed "indirect rate" might surpass 100%. To prevent any confusion, we manually constrain the result within the range of 0% to 100%.)*
 
@@ -96,6 +98,10 @@ We can also derive the confidence interval for $ISR_i$ or $DSR_i$ based on the c
 
 $$CI_{ISR_i} = (\frac{\sum_{j = 1}^{n_i} \frac{e^{\gamma_{i,L} + Z_{ij}\hat{\boldsymbol{\beta}}}}{1 + e^{\gamma_{i,L} + Z_{ij}\hat{\boldsymbol{\beta}}}}}{E_i}, \frac{\sum_{j = 1}^{n_i} \frac{e^{\gamma_{i,U} + Z_{ij}\hat{\boldsymbol{\beta}}}}{1 + e^{\gamma_{i,U} + Z_{ij}\hat{\boldsymbol{\beta}}}}}{E_i}).$$ Here, $\gamma_{i,L}$ and $\gamma_{i,U}$ are the lower and upper bounds of $\gamma_i$. *(If $CI(\gamma_i)$ covers $\gamma_0$, then $CI_{ISR_i}$ will cover 1.)*
 
-* $DSR_i$: Considering $DSR_{0} = \frac{\sum_{i = 1}^m \sum_{j = 1}^{n_i} \frac{e^{{\gamma}_0 + Z_{ij}\hat{\boldsymbol{\beta}}}}{1 + e^{{\gamma}_0 + Z_{ij}\hat{\boldsymbol{\beta}}}}}{\sum_{i = 1}^m O_i}.$ The CI of $DSR_i$ can be calculated as:
+* $DSR_k$: Considering $DSR_{0} = \frac{\sum_{i = 1}^m \sum_{j = 1}^{n_i} \frac{e^{{\gamma}_0 + Z_{ij}\hat{\boldsymbol{\beta}}}}{1 + e^{{\gamma}_0 + Z_{ij}\hat{\boldsymbol{\beta}}}}}{\sum_{i = 1}^m O_i}.$ The CI of $DSR_k$ can be calculated as:
 
-$$CI_{DSR_i} = (\frac{\sum_{i = 1}^m \sum_{j = 1}^{n_i} \frac{e^{{\gamma}_{i,L} + Z_{ij}\hat{\boldsymbol{\beta}}}}{1 + e^{{\gamma}_{i,L} + Z_{ij}\hat{\boldsymbol{\beta}}}}}{\sum_{i = 1}^m O_i}, \frac{\sum_{i = 1}^m \sum_{j = 1}^{n_i} \frac{e^{{\gamma}_{i,U} + Z_{ij}\hat{\boldsymbol{\beta}}}}{1 + e^{{\gamma}_{i,U} + Z_{ij}\hat{\boldsymbol{\beta}}}}}{\sum_{i = 1}^m O_i}).$$ *(If $CI(\gamma_i)$ covers $\gamma_0$, then $CI_{DSR_i}$ will cover $DSR_0$.)*
+$$CI_{DSR_k} = (\frac{\sum_{i = 1}^m \sum_{j = 1}^{n_i} \frac{e^{{\gamma}_{k,L} + Z_{ij}\hat{\boldsymbol{\beta}}}}{1 + e^{{\gamma}_{k,L} + Z_{ij}\hat{\boldsymbol{\beta}}}}}{\sum_{i = 1}^m O_i}, \frac{\sum_{i = 1}^m \sum_{j = 1}^{n_i} \frac{e^{{\gamma}_{k,U} + Z_{ij}\hat{\boldsymbol{\beta}}}}{1 + e^{{\gamma}_{k,U} + Z_{ij}\hat{\boldsymbol{\beta}}}}}{\sum_{i = 1}^m O_i}).$$ Similarly, $\gamma_{k,L}$ and $\gamma_{k,U}$ are the lower and upper bounds of $\gamma_k$.  *(If $CI(\gamma_k)$ covers $\gamma_0$, then $CI_{DSR_k}$ will cover $DSR_k$.)*
+
+
+
+

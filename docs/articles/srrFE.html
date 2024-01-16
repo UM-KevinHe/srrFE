@@ -72,15 +72,12 @@
   </div>
 </nav><div class="container template-article">
 
-
-
-
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Getting Started with srrFE</h1>
                         <h4 data-toc-skip class="author">Yubo Shao</h4>
             
-            <h4 data-toc-skip class="date"><span style="font-style:normal;font-family:'Open Sans'">2024-01-08</span></h4>
+            <h4 data-toc-skip class="date"><span style="font-style:normal;font-family:'Open Sans'">2024-01-16</span></h4>
       
       <small class="dont-index">Source: <a href="https://github.com/UM-KevinHe/srrFE/blob/HEAD/vignettes/srrFE.Rmd" class="external-link"><code>vignettes/srrFE.Rmd</code></a></small>
       <div class="d-none name"><code>srrFE.Rmd</code></div>
@@ -96,24 +93,12 @@ body {
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>The <code>srrFE</code> software package is designed to implement the
-SerBIN method proposed by <a href="https://onlinelibrary.wiley.com/doi/full/10.1002/sim.9387" class="external-link">Wu et
-al. (2022)</a>, specifically tailored to address the computational
-challenges inherent in large-scale provider data. Additionally, the
-package is equipped with functions designed to estimate standardized
-ratios and rates and conduct hypothesis testing.</p>
-<p>In this vignette, we will explore the fundamental usage of the
-functions integrated into the current R package.</p>
+<p>The <code>srrFE</code> software package is designed to implement the SerBIN method proposed by <a href="https://onlinelibrary.wiley.com/doi/full/10.1002/sim.9387" class="external-link">Wu et al. (2022)</a>, specifically tailored to address the computational challenges inherent in large-scale provider data. Additionally, the package is equipped with functions designed to estimate standardized ratios and rates and conduct hypothesis testing.</p>
+<p>In this vignette, we will explore the fundamental usage of the functions integrated into the current R package.</p>
 <ul>
-<li><p>For more details, please see the <a href="https://um-kevinhe.github.io/srrFE/reference/index.html">Reference</a>
-section.</p></li>
-<li><p>To learn the algorithms employed by <code>srrFE</code>, refer to
-the <a href="https://um-kevinhe.github.io/srrFE/articles/Models.html">Models</a>
-section or see the <a href="https://um-kevinhe.github.io/srrFE/articles/Articles.html">original
-articles</a>.</p></li>
-<li><p>If you need a more concise guide to quickly use the package,
-please refer to the <a href="https://um-kevinhe.github.io/srrFE/articles/Quick-start.html">Quick
-Start</a>.</p></li>
+<li><p>For more details, please see the <a href="https://um-kevinhe.github.io/srrFE/reference/index.html">Reference</a> section.</p></li>
+<li><p>To learn the algorithms employed by <code>srrFE</code>, refer to the <a href="https://um-kevinhe.github.io/srrFE/articles/Models.html">Models</a> section or see the <a href="https://um-kevinhe.github.io/srrFE/articles/Articles.html">original articles</a>.</p></li>
+<li><p>If you need a more concise guide to quickly use the package, please refer to the <a href="https://um-kevinhe.github.io/srrFE/articles/Quick-start.html">Quick Start</a>.</p></li>
 </ul>
 </div>
 <div class="section level2">
@@ -128,9 +113,7 @@ Start</a>.</p></li>
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
-<p>We will employ a simulated dataset contained in the current package
-to illustrate how to utilize this package for data analysis. The data
-named <code>data_FE</code> includes the information of:</p>
+<p>We will employ a simulated dataset contained in the current package to illustrate how to utilize this package for data analysis. The data named <code>data_FE</code> includes the information of:</p>
 <ul>
 <li><p>Y: the binary outcome variable</p></li>
 <li><p>ID: provider identifiers</p></li>
@@ -142,11 +125,7 @@ named <code>data_FE</code> includes the information of:</p>
 <div class="section level3">
 <h3 id="data-preparation-function">Data Preparation Function<a class="anchor" aria-label="anchor" href="#data-preparation-function"></a>
 </h3>
-<p>Typically, users should employ the <code><a href="../reference/fe_data_prep.html">fe_data_prep()</a></code>
-function to preprocess their data. We advise users to review the data
-and consider making adjustments based on the output information if
-necessary. (<em>Please know that the subsequent functions should be used
-based on this processed data</em>)</p>
+<p>Typically, users should employ the <code><a href="../reference/fe_data_prep.html">fe_data_prep()</a></code> function to preprocess their data. We advise users to review the data and consider making adjustments based on the output information if necessary. (<em>Please know that the subsequent functions should be used based on this processed data</em>)</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data.prep</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fe_data_prep.html">fe_data_prep</a></span><span class="op">(</span><span class="va">data_FE</span><span class="op">$</span><span class="va">Y</span>, <span class="va">data_FE</span><span class="op">$</span><span class="va">Z</span>, <span class="va">data_FE</span><span class="op">$</span><span class="va">ID</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking missingness of variables ...</span></span>
@@ -158,30 +137,25 @@ based on this processed data</em>)</p>
 <span><span class="co">#&gt; Checking VIF of covariates ...</span></span>
 <span><span class="co">#&gt; Checking VIF of covariates completed!</span></span>
 <span><span class="co">#&gt; Warning: 0 out of 10 providers considered small and filtered out!</span></span>
-<span><span class="co">#&gt; 0 out of 10 remaining providers with no events.</span></span>
-<span><span class="co">#&gt; 0 out of 10 remaining providers with all events.</span></span>
-<span><span class="co">#&gt; After screening, 52% of all records exhibit occurrences of events (Y = 1)</span></span>
+<span><span class="co">#&gt; 0 out of 10 remaining providers with no readmission within 30 days.</span></span>
+<span><span class="co">#&gt; 0 out of 10 remaining providers with all readmissions within 30 days.</span></span>
+<span><span class="co">#&gt; After screening, 52% of all discharges were readmitted within 30 days.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data.prep</span><span class="op">$</span><span class="va">data</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    Y ID      Z1      Z2      Z3      Z4 included no.events all.events</span></span>
-<span><span class="co">#&gt; 38 1  1 -0.7124  0.3953 -0.8402  0.0840        1         0          0</span></span>
-<span><span class="co">#&gt; 6  0  1  0.3660 -0.7654  1.8015 -0.5231        1         0          0</span></span>
-<span><span class="co">#&gt; 2  0  1 -0.0715  0.3307 -0.1121 -0.3115        1         0          0</span></span>
-<span><span class="co">#&gt; 32 1  1  1.2804 -0.7822  0.0941  0.7869        1         0          0</span></span>
-<span><span class="co">#&gt; 34 0  1  0.4012 -0.5114  0.3514 -0.8059        1         0          0</span></span>
-<span><span class="co">#&gt; 23 0  1  0.8727 -0.7320 -0.2893 -0.0106        1         0          0</span></span></code></pre></div>
+<span><span class="co">#&gt;    Y ID      Z1      Z2      Z3      Z4 included no.readm all.readm</span></span>
+<span><span class="co">#&gt; 38 1  1 -0.7124  0.3953 -0.8402  0.0840        1        0         0</span></span>
+<span><span class="co">#&gt; 6  0  1  0.3660 -0.7654  1.8015 -0.5231        1        0         0</span></span>
+<span><span class="co">#&gt; 2  0  1 -0.0715  0.3307 -0.1121 -0.3115        1        0         0</span></span>
+<span><span class="co">#&gt; 32 1  1  1.2804 -0.7822  0.0941  0.7869        1        0         0</span></span>
+<span><span class="co">#&gt; 34 0  1  0.4012 -0.5114  0.3514 -0.8059        1        0         0</span></span>
+<span><span class="co">#&gt; 23 0  1  0.8727 -0.7320 -0.2893 -0.0106        1        0         0</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="model-fitting">Model Fitting<a class="anchor" aria-label="anchor" href="#model-fitting"></a>
 </h3>
-<p>The <code><a href="../reference/logis_fe.html">logis_fe()</a></code> function is employed to fit the fixed
-effect model. In the first three argument positions of this function,
-users are required to supply the object generated from previous
-<code><a href="../reference/fe_data_prep.html">fe_data_prep()</a></code> function.</p>
+<p>The <code><a href="../reference/logis_fe.html">logis_fe()</a></code> function is employed to fit the fixed effect model. In the first three argument positions of this function, users are required to supply the object generated from previous <code><a href="../reference/fe_data_prep.html">fe_data_prep()</a></code> function.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_fe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/logis_fe.html">logis_fe</a></span><span class="op">(</span><span class="va">data.prep</span><span class="op">)</span></span></code></pre></div>
-<p>Users most commonly utilize the output to obtain estimates of the
-provider effects and covariate coefficients by <code><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef()</a></code>
-function.</p>
+<p>Users most commonly utilize the output to obtain estimates of the provider effects and covariate coefficients by <code><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef()</a></code> function.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">fit_fe</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $gamma</span></span>
@@ -207,13 +181,7 @@ function.</p>
 <div class="section level3">
 <h3 id="measures-output">Measures Output<a class="anchor" aria-label="anchor" href="#measures-output"></a>
 </h3>
-<p>Based on the results obtained from the fitted model, users can easily
-calculate direct or indirect standardized rates and ratios as per their
-specific requirements. The <code><a href="../reference/SR_output.html">SR_output()</a></code> function simply
-necessitates the users to input the object returned from the
-<code><a href="../reference/logis_fe.html">logis_fe()</a></code> function and specify the desired type of
-measure. By default, both indirect standardized rate and indirect
-standardized ratio will be provided.</p>
+<p>Based on the results obtained from the fitted model, users can easily calculate direct or indirect standardized rates and ratios as per their specific requirements. The <code><a href="../reference/SR_output.html">SR_output()</a></code> function simply necessitates the users to input the object returned from the <code><a href="../reference/logis_fe.html">logis_fe()</a></code> function and specify the desired type of measure. By default, both indirect standardized rate and indirect standardized ratio will be provided.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">SR</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SR_output.html">SR_output</a></span><span class="op">(</span><span class="va">fit_fe</span><span class="op">)</span></span>
 <span><span class="va">SR</span><span class="op">$</span><span class="va">indirect.rate</span></span>
@@ -244,9 +212,7 @@ standardized ratio will be provided.</p>
 <div class="section level3">
 <h3 id="hypothesis-testing-for-provider-effects">Hypothesis Testing for Provider Effects<a class="anchor" aria-label="anchor" href="#hypothesis-testing-for-provider-effects"></a>
 </h3>
-<p>The <code><a href="../reference/test_fe.html">test_fe()</a></code> function provides hypothesis testing
-outcomes to assist users in identifying outlier providers with extreme
-outcomes.</p>
+<p>The <code><a href="../reference/test_fe.html">test_fe()</a></code> function provides hypothesis testing outcomes to assist users in identifying outlier providers with extreme outcomes.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">test_poisbinom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/test_fe.html">test_fe</a></span><span class="op">(</span><span class="va">fit_fe</span><span class="op">)</span></span>
 <span><span class="va">test_poisbinom</span></span>
@@ -261,20 +227,12 @@ outcomes.</p>
 <span><span class="co">#&gt; 8     0 7.678697e-01  0.2951626</span></span>
 <span><span class="co">#&gt; 9     1 3.317876e-03  2.9366413</span></span>
 <span><span class="co">#&gt; 10    0 7.044033e-01 -0.3793832</span></span></code></pre></div>
-<p>The function returns a 3-column dataframe, with the “flag” column
-indicating whether a provider is flagged (where 0 denotes that the
-provider is not flagged, and 1 or -1 represents outlier providers based
-on the user’s data interpretation). The last two columns contain
-p-values and their corresponding test statistics.</p>
+<p>The function returns a 3-column dataframe, with the “flag” column indicating whether a provider is flagged (where 0 denotes that the provider is not flagged, and 1 or -1 represents outlier providers based on the user’s data interpretation). The last two columns contain p-values and their corresponding test statistics.</p>
 </div>
 <div class="section level3">
 <h3 id="hypothesis-testing-for-covariate-coefficients">Hypothesis Testing for Covariate Coefficients<a class="anchor" aria-label="anchor" href="#hypothesis-testing-for-covariate-coefficients"></a>
 </h3>
-<p>Additionally, we offer the <code><a href="../reference/summary_fe_covar.html">summary_fe_covar()</a></code> function,
-which provides the test statistics for the covariate coefficients <span class="math inline">\(\beta\)</span>. The test statistics can be
-calculated by the “wald test” (use <code>"wald.cpp"</code> or
-<code>"wald"</code> option), “score test” (use <code>"score"</code>
-option), or “likelihood ratio test” (use <code>"lr"</code> option).</p>
+<p>Additionally, we offer the <code><a href="../reference/summary_fe_covar.html">summary_fe_covar()</a></code> function, which provides the test statistics for the covariate coefficients <span class="math inline">\(\beta\)</span>. The test statistics can be calculated by the “wald test” (use <code>"wald.cpp"</code> or <code>"wald"</code> option), “score test” (use <code>"score"</code> option), or “likelihood ratio test” (use <code>"lr"</code> option).</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/summary_fe_covar.html">summary_fe_covar</a></span><span class="op">(</span><span class="va">fit_fe</span><span class="op">)</span></span>
 <span><span class="co">#&gt;          beta   se.beta            p   CI.lower   CI.upper</span></span>
@@ -282,26 +240,13 @@ option), or “likelihood ratio test” (use <code>"lr"</code> option).</p>
 <span><span class="co">#&gt; Z2 -1.2672733 0.1927867 4.916271e-11 -1.6451282 -0.8894184</span></span>
 <span><span class="co">#&gt; Z3  0.5674081 0.1744281 1.142086e-03  0.2255353  0.9092810</span></span>
 <span><span class="co">#&gt; Z4  3.4980033 0.3371212 0.000000e+00  2.8372578  4.1587488</span></span></code></pre></div>
-<p>The returned dataframe includes the estimates of the covariate
-coefficients and their corresponding p-values. Furthermore, the Wald
-test offers additional confidence intervals.</p>
+<p>The returned dataframe includes the estimates of the covariate coefficients and their corresponding p-values. Furthermore, the Wald test offers additional confidence intervals.</p>
 </div>
 <div class="section level3">
 <h3 id="confidence-interval-for-provider-effects">Confidence Interval for Provider Effects<a class="anchor" aria-label="anchor" href="#confidence-interval-for-provider-effects"></a>
 </h3>
-<p>The <code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint()</a></code> function can be used to provide the
-confidence intervals for the provider effects (i.e. <span class="math inline">\(\gamma_i\)</span>) for each providers selected to
-be tested. User needs to explicitly specify
-<code>option = "gamma"</code>.</p>
-<p>Users can choose the method for generating confidence intervals from
-either <code>"exact"</code>, <code>"wald"</code>, or
-<code>"score"</code> test. To maintain consistency between the
-confidence interval (CI) and the previous test results, it is advisable
-to use the same test option for both the <code><a href="../reference/test_fe.html">test_fe()</a></code> and
-<code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint()</a></code> functions. Please note that the
-<code>"exact"</code> option in the <code><a href="../reference/test_fe.html">test_fe()</a></code> function
-corresponds to the <code>"exact.poisbinom"</code> option in the
-<code><a href="../reference/test_fe.html">test_fe()</a></code> function.</p>
+<p>The <code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint()</a></code> function can be used to provide the confidence intervals for the provider effects (i.e. <span class="math inline">\(\gamma_i\)</span>) for each providers selected to be tested. User needs to explicitly specify <code>option = "gamma"</code>.</p>
+<p>Users can choose the method for generating confidence intervals from either <code>"exact"</code>, <code>"wald"</code>, or <code>"score"</code> test. To maintain consistency between the confidence interval (CI) and the previous test results, it is advisable to use the same test option for both the <code><a href="../reference/test_fe.html">test_fe()</a></code> and <code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint()</a></code> functions. Please note that the <code>"exact"</code> option in the <code><a href="../reference/test_fe.html">test_fe()</a></code> function corresponds to the <code>"exact.poisbinom"</code> option in the <code><a href="../reference/test_fe.html">test_fe()</a></code> function.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">fit_fe</span>, option <span class="op">=</span> <span class="st">"gamma"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           gamma gamma.lower gamma.upper</span></span>
@@ -315,20 +260,12 @@ corresponds to the <code>"exact.poisbinom"</code> option in the
 <span><span class="co">#&gt; 8   0.304527080  -0.7020479   1.3619158</span></span>
 <span><span class="co">#&gt; 9   1.727970674   0.6661555   2.7870210</span></span>
 <span><span class="co">#&gt; 10 -0.034881361  -0.9473625   0.8875052</span></span></code></pre></div>
-<p>The returned data frame offers estimates of the provider effects, and
-both upper and lower limits of the CIs (defaulting to a 95% confidence
-level on both sides).</p>
+<p>The returned data frame offers estimates of the provider effects, and both upper and lower limits of the CIs (defaulting to a 95% confidence level on both sides).</p>
 </div>
 <div class="section level3">
 <h3 id="confidence-interval-for-measures">Confidence Interval for Measures<a class="anchor" aria-label="anchor" href="#confidence-interval-for-measures"></a>
 </h3>
-<p>For users interested in the CIs of direct/indirect standardized rates
-or ratios, the <code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint()</a></code> function can be also used for this
-purpose with explicitly specify <code>option = "SR"</code>.
-Additionally, users should input the object returned from the
-<code><a href="../reference/logis_fe.html">logis_fe()</a></code> function and specify the desired type of
-measure. By default, both indirect standardized rate and indirect
-standardized ratio will be provided.</p>
+<p>For users interested in the CIs of direct/indirect standardized rates or ratios, the <code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint()</a></code> function can be also used for this purpose with explicitly specify <code>option = "SR"</code>. Additionally, users should input the object returned from the <code><a href="../reference/logis_fe.html">logis_fe()</a></code> function and specify the desired type of measure. By default, both indirect standardized rate and indirect standardized ratio will be provided.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">fit_fe</span>, option <span class="op">=</span> <span class="st">"SR"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $CI.indirect_ratio</span></span>
@@ -356,9 +293,7 @@ standardized ratio will be provided.</p>
 <span><span class="co">#&gt; 8       53.10285      45.68444      59.60779</span></span>
 <span><span class="co">#&gt; 9       62.11370      55.40157      68.85185</span></span>
 <span><span class="co">#&gt; 10      50.39159      41.94419      58.59812</span></span></code></pre></div>
-<p>Similarly, the function will return a three-column data frame that
-provides an estimate of the selected measure along with its
-corresponding upper and lower bounds of the CIs.</p>
+<p>Similarly, the function will return a three-column data frame that provides an estimate of the selected measure along with its corresponding upper and lower bounds of the CIs.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
