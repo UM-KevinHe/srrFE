@@ -31,14 +31,14 @@ Data preparation before modelling
 }
 \details{
 Major steps in this stage include (in order):
-  \itemize{
-  \item checking missingness, variation, correlation and VIF of variables in the data,
-  \item provider screening based on the provider size, 10 as default,
-  \item reporting proportions of providers with no events (i.e. all "0" outcomes) and with all events (i.e. all "1" outcomes),
-  \item sorting data by provider identifiers.
-  }
+\itemize{
+\item checking missingness, variation, correlation and VIF of variables in the data,
+\item provider screening based on the provider size, 10 as default,
+\item reporting proportions of providers with no events (i.e. all "0" outcomes) and with all events (i.e. all "1" outcomes),
+\item sorting data by provider identifiers.
+}
 
-The `fe_data_prep()` function returns data sorted by the provider identifiers,
+The \code{fe_data_prep()} function returns data sorted by the provider identifiers,
 accompanied by additional provider-related information indicating whether the provider's size exceeds a specified "cutoff"
 and whether the respective provider has experienced either zero or all events.
 The reason behind introducing a "cutoff" lies in findings from both simulated and real data studies,
@@ -46,7 +46,7 @@ revealing the instability of coefficient estimates for providers with small size
 Consequently, we recommend excluding small providers during the model fitting process.
 It is important to note that the resultant data frame retains all providers, including small ones,
 but utilizes the "included = 0" label to signify the small providers. Subsequently, during the model fitting stage,
-the `logis_fe()` function disregards records marked with "included = 0".
+the \code{logis_fe()} function disregards records marked with "included = 0".
 }
 \examples{
 data(data_FE)

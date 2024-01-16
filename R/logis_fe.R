@@ -5,8 +5,8 @@
 #'
 #' @param algorithm a string specifying the algorithm to be used. Defaulting to "SerBIN".
 #'   \itemize{
-#'   \item "SerBIN": using the Serial blockwise inversion Newton algorithm to fit the model (See reference: Wu et al.).
-#'   \item "BAN": using the block ascent Newton algorithm to fit the model (See reference: He et al.).
+#'   \item "SerBIN": using the Serial blockwise inversion Newton algorithm to fit the model (See [Wu et al. (2022)](https://onlinelibrary.wiley.com/doi/full/10.1002/sim.9387)).
+#'   \item "BAN": using the block ascent Newton algorithm to fit the model (See [He et al. (2013)](https://link.springer.com/article/10.1007/s10985-013-9264-6)).
 #'   }
 #' @param max.iter maximum number of iterations. Defaulting to 10,000.
 #'
@@ -27,16 +27,18 @@
 #'
 #' @details
 #'
-#' The default algorithm is based on Serial blockwise inversion Newton (SerBIN) proposed by Wu et al. (2022),
-#' but users can also choose to use the block ascent Newton (BAN) algorithm proposed by He et al. (2013) to fit the model.
+#' The default algorithm is based on Serial blockwise inversion Newton (SerBIN) proposed by
+#' [Wu et al. (2022)](https://onlinelibrary.wiley.com/doi/full/10.1002/sim.9387),
+#' but users can also choose to use the block ascent Newton (BAN) algorithm proposed by
+#' [He et al. (2013)](https://link.springer.com/article/10.1007/s10985-013-9264-6) to fit the model.
 #' Both methodologies build upon the Newton-Raphson method, yet SerBIN simultaneously updates both the provider effect and covariate coefficient.
 #' This concurrent update necessitates the inversion of the complete information matrix at each iteration.
 #' In contrast, BAN adopts a two-layer updating approach, where the covariate coefficient is sequentially fixed to update the provider effect,
 #' followed by fixing the provider effect to update the covariate coefficient.
 #'
-#' We suggest using the default "SerBIN" option as it typically converges much faster for most datasets.
+#' We suggest using the default `"SerBIN"` option as it typically converges much faster for most datasets.
 #' However, in rare cases where the SerBIN algorithm encounters second-order derivative irreversibility leading to an error,
-#' users can consider using the "BAN" option as an alternative.
+#' users can consider using the `"BAN"` option as an alternative.
 #'
 #' For a deeper understanding, please consult the original article for detailed insights.
 #'

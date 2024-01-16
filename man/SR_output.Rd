@@ -16,14 +16,14 @@ SR_output(
 
 \item{stdz}{a character string specifying the standardization method. Defaulting to "indirect".
 \itemize{
-  \item{"indirect":} using indirect standardized method
-  \item{"direct":} using direct standardized method
+\item{"indirect":} using indirect standardized method
+\item{"direct":} using direct standardized method
 }}
 
 \item{measure}{a boolean indicating whether the output measure is "ratio" or "rate". Both "rate" and "ratio" will be provided by default.
 \itemize{
-  \item{"rate":} output the standardized rate. The "rate" has been restricted to 0% - 100%.
-  \item{"ratio":} output the standardized ratio.
+\item{"rate":} output the standardized rate. The "rate" has been restricted to 0\% - 100\%.
+\item{"ratio":} output the standardized ratio.
 }}
 
 \item{null}{if "stdz = indirect", a character string or real number specifying null hypotheses of fixed provider effects for calculating standardized rate/ratio. Defaulting to "median".}
@@ -45,8 +45,8 @@ The return values depend on the user's choice of standardization method and meas
 Provide direct/indirect standardization ratio or rate
 }
 \details{
-The "stdz" and "measure" arguments must be explicitly provided.
-Users are allowed to specify "stdz = c("indirect", "direct")" or "measure = c("rate", "ratio")" to get multiple measures.
+The \code{"stdz"} and \code{"measure"} arguments must be explicitly provided.
+Users are allowed to specify \verb{"stdz = c("indirect", "direct")"} or \verb{"measure = c("rate", "ratio")"} to get multiple measures.
 }
 \examples{
 data(data_FE)

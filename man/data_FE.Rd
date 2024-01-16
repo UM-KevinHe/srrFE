@@ -7,9 +7,9 @@
 \format{
 A list containing the following elements:
 \describe{
-  \item{Y}{a vector represents the binary outcome}
-  \item{ID}{a vector represents the facility indicator (10 facilities in total)}
-  \item{Z}{a data frame contains 4 continuous variables}
+\item{Y}{a vector represents the binary outcome}
+\item{ID}{a vector represents the facility indicator (10 facilities in total)}
+\item{Z}{a data frame contains 4 continuous variables}
 }
 }
 \usage{

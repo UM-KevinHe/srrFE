@@ -24,7 +24,7 @@
 #'
 #'
 #' @details
-#' By default, the function uses the "exact.poisbinom" method.
+#' By default, the function uses the `"exact.poisbinom"` method.
 #' The wald test is invalid for extreme providers (i.e. when provider effect goes to infinity).
 #'
 #'

@@ -42,7 +42,7 @@
 
 \item{measure}{if option = 'SR', a boolean indicating whether the output measure is "ratio" or "rate". Both "rate" and "ratio" will be provided by default.
 \itemize{
-\item "rate": output the standardized rate. The "rate" has been restricted to 0% - 100%.
+\item "rate": output the standardized rate. The "rate" has been restricted to 0\% - 100\%.
 \item "ratio":  output the standardized ratio
 }}
 

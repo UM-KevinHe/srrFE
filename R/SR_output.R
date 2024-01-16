@@ -22,8 +22,8 @@
 #'
 #' @details
 #'
-#' The "stdz" and "measure" arguments must be explicitly provided.
-#' Users are allowed to specify "stdz = c("indirect", "direct")" or "measure = c("rate", "ratio")" to get multiple measures.
+#' The `"stdz"` and `"measure"` arguments must be explicitly provided.
+#' Users are allowed to specify `"stdz = c("indirect", "direct")"` or `"measure = c("rate", "ratio")"` to get multiple measures.
 #'
 #'
 #' @return The return values depend on the user's choice of standardization method and measure type

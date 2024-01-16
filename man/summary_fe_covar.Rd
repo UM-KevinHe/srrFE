@@ -15,10 +15,10 @@ summary_fe_covar(fit, parm, level = 0.95, test = "wald.cpp", null = 0)
 
 \item{test}{a character string specifying the type of testing method. Defaulting to "wald.cpp".
 \itemize{
-  \item "wald": wald test
-  \item "wald.cpp": wald test using cpp function
-  \item "lr": likelihood ratio test
-  \item "score": score test
+\item "wald": wald test
+\item "wald.cpp": wald test using cpp function
+\item "lr": likelihood ratio test
+\item "score": score test
 }}
 
 \item{null}{the null value of the covariate estimate that requires testing. (e.g. test \eqn{H_0: \beta = 0})}

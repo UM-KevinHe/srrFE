@@ -76,12 +76,12 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>data.prep</dt>
-<dd><p>an object from the `fe_data_prep()` function.</p></dd>
+<dd><p>an object from the <code><a href="fe_data_prep.html">fe_data_prep()</a></code> function.</p></dd>
 
 
 <dt>algorithm</dt>
-<dd><p>a string specifying the algorithm to be used. Defaulting to "SerBIN".</p><ul><li><p>"SerBIN": using the Serial blockwise inversion Newton algorithm to fit the model (See reference: Wu et al.).</p></li>
-<li><p>"BAN": using the block ascent Newton algorithm to fit the model (See reference: He et al.).</p></li>
+<dd><p>a string specifying the algorithm to be used. Defaulting to "SerBIN".</p><ul><li><p>"SerBIN": using the Serial blockwise inversion Newton algorithm to fit the model (See <a href="https://onlinelibrary.wiley.com/doi/full/10.1002/sim.9387" class="external-link">Wu et al. (2022)</a>).</p></li>
+<li><p>"BAN": using the block ascent Newton algorithm to fit the model (See <a href="https://link.springer.com/article/10.1007/s10985-013-9264-6" class="external-link">He et al. (2013)</a>).</p></li>
 </ul></dd>
 
 
@@ -152,15 +152,17 @@
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The default algorithm is based on Serial blockwise inversion Newton (SerBIN) proposed by Wu et al. (2022),
-but users can also choose to use the block ascent Newton (BAN) algorithm proposed by He et al. (2013) to fit the model.
+    <p>The default algorithm is based on Serial blockwise inversion Newton (SerBIN) proposed by
+<a href="https://onlinelibrary.wiley.com/doi/full/10.1002/sim.9387" class="external-link">Wu et al. (2022)</a>,
+but users can also choose to use the block ascent Newton (BAN) algorithm proposed by
+<a href="https://link.springer.com/article/10.1007/s10985-013-9264-6" class="external-link">He et al. (2013)</a> to fit the model.
 Both methodologies build upon the Newton-Raphson method, yet SerBIN simultaneously updates both the provider effect and covariate coefficient.
 This concurrent update necessitates the inversion of the complete information matrix at each iteration.
 In contrast, BAN adopts a two-layer updating approach, where the covariate coefficient is sequentially fixed to update the provider effect,
 followed by fixing the provider effect to update the covariate coefficient.</p>
-<p>We suggest using the default "SerBIN" option as it typically converges much faster for most datasets.
+<p>We suggest using the default <code>"SerBIN"</code> option as it typically converges much faster for most datasets.
 However, in rare cases where the SerBIN algorithm encounters second-order derivative irreversibility leading to an error,
-users can consider using the "BAN" option as an alternative.</p>
+users can consider using the <code>"BAN"</code> option as an alternative.</p>
 <p>For a deeper understanding, please consult the original article for detailed insights.</p>
     </div>
     <div class="section level2">

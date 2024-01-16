@@ -48,7 +48,7 @@ and "-1" means statistically lower than expected}
 Conduct hypothesis testing for identifying outlying providers
 }
 \details{
-By default, the function uses the "exact.poisbinom" method.
+By default, the function uses the \code{"exact.poisbinom"} method.
 The wald test is invalid for extreme providers (i.e. when provider effect goes to infinity).
 }
 \examples{
