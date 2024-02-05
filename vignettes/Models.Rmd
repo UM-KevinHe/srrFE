@@ -70,7 +70,7 @@ Users also have the option to request the function to generate a "standardized r
 
 The `test_fe()` function provides hypothesis testing outcomes to assist users in identifying outlier providers with extreme outcomes. By default, we use the median of all estimated provider effects as the null value (i.e. $H_0: \gamma_i = \hat{\gamma}_{med}$). Users can choose from various testing methods, including "exact.poisbinom" (default), "exact.bootstrap," "score," and "wald":
 
-* **"exact.poisbinom"**: Assume $Y_{ij}|Z_{ij} \sim Bernoulli(p_{ij})$. Since within the provider $i$, $p_{ij} = \frac{e^{\gamma_i + Z_{ij}\boldsymbol{\beta}}}{1 + e^{\gamma_i + Z_{ij}\boldsymbol{\beta}}}$ varies, $O_i | Z_i = \sum_{j = 1}^{n_i}Y_{ij}$ will follow the Poisson-binomial distribution. We then calculate the probability of "getting a more extreme number of $O_i$, if $H_0$ is true" based on the Poisson-binomial distribution.
+* **"exact.poisbinom"**: Assume $Y_{ij}|Z_{ij} \sim Bernoulli(p_{ij})$. Since within the provider $i$, $p_{ij} = \frac{e^{\gamma_i + Z_{ij}\boldsymbol{\beta}}}{1 + e^{\gamma_i + Z_{ij}\boldsymbol{\beta}}}$ varies, $O_i | Z_i = \sum_{j = 1}^{n_i}Y_{ij}$ will follow the Poisson-binomial distribution. We then calculate the probability of "getting a more extreme number of $O_i$, if $H_0: \gamma_i = \gamma_0$ is true" based on the Poisson-binomial distribution.
 
 * **"exact.bootstrap"**: The test is conducted in the following steps: (1) Repeat $B =$ 10,000 times (default): Simulate ${Y_{ij}}^{(b)} \sim Bernoulli(\frac{e^{\gamma_0 + Z_{ij}\boldsymbol{\beta}}}{1 + e^{\gamma_0 + Z_{ij}\boldsymbol{\beta}}})$, and calculate ${Y_{i}}^{(b)} = \sum_{j = 1}^{n_i} {Y_{ij}}^{(b)}$. (2) Calculate the frequency that ${Y_{i}}^{(b)}$ is more extreme than $O_i$. (3) calculate the $p-$value. *("Exact Bootstrap" is consistent to "Exact Poisson-binomial")*
 
@@ -101,7 +101,3 @@ $$CI_{ISR_i} = (\frac{\sum_{j = 1}^{n_i} \frac{e^{\gamma_{i,L} + Z_{ij}\hat{\bol
 * $DSR_k$: Considering $DSR_{0} = \frac{\sum_{i = 1}^m \sum_{j = 1}^{n_i} \frac{e^{{\gamma}_0 + Z_{ij}\hat{\boldsymbol{\beta}}}}{1 + e^{{\gamma}_0 + Z_{ij}\hat{\boldsymbol{\beta}}}}}{\sum_{i = 1}^m O_i}.$ The CI of $DSR_k$ can be calculated as:
 
 $$CI_{DSR_k} = (\frac{\sum_{i = 1}^m \sum_{j = 1}^{n_i} \frac{e^{{\gamma}_{k,L} + Z_{ij}\hat{\boldsymbol{\beta}}}}{1 + e^{{\gamma}_{k,L} + Z_{ij}\hat{\boldsymbol{\beta}}}}}{\sum_{i = 1}^m O_i}, \frac{\sum_{i = 1}^m \sum_{j = 1}^{n_i} \frac{e^{{\gamma}_{k,U} + Z_{ij}\hat{\boldsymbol{\beta}}}}{1 + e^{{\gamma}_{k,U} + Z_{ij}\hat{\boldsymbol{\beta}}}}}{\sum_{i = 1}^m O_i}).$$ Similarly, $\gamma_{k,L}$ and $\gamma_{k,U}$ are the lower and upper bounds of $\gamma_k$.  *(If $CI(\gamma_k)$ covers $\gamma_0$, then $CI_{DSR_k}$ will cover $DSR_k$.)*
-
-
-
-
