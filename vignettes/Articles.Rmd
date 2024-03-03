@@ -1,0 +1,29 @@
+---
+title: "Articles"
+author: "Yubo Shao"
+date: <span style="font-style:normal;font-family:'Open Sans'">`r Sys.Date()`</span>
+output: 
+  rmarkdown::html_vignette:
+    self_contained: yes
+    mode: selfcontained
+vignette: >
+  %\VignetteIndexEntry{Articles}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = T,
+  comment = "#>"
+)
+```
+
+<style>
+body {
+  text-align: justify
+}
+</style>
+
+* [Wu, W., Yang, Y., Kang, J., & He, K. (2022). Improving large‐scale estimation and inference for profiling health care providers. Statistics in Medicine, 41(15), 2840-2853.](https://onlinelibrary.wiley.com/doi/full/10.1002/sim.9387)
+* [He, K., Kalbfleisch, J. D., Li, Y., & Li, Y. (2013). Evaluating hospital readmission rates in dialysis facilities; adjusting for hospital effects. Lifetime Data Analysis, 19, 490-512.](https://link.springer.com/article/10.1007/s10985-013-9264-6)

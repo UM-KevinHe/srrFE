@@ -1,0 +1,51 @@
+url: https://um-kevinhe.github.io/srrFE/
+template:
+  bootstrap: 5
+  bootswatch: lumen
+  bslib:
+    base_font: {google: "Roboto"}
+    heading_font: {google: "Roboto Slab"}
+    code_font: {google: "JetBrains Mono"}
+
+
+vignettes:
+  - vignettes/srrFE.Rmd
+
+authors:
+  Kevin He:
+    href: "https://www.um-kevinhe-group.org/"
+  Wenbo Wu:
+    href: "https://www.wenbowu.me/"
+
+navbar:
+ components:
+   articles:
+    text: Appendix
+    menu:
+    - text: Quick Start
+      href: articles/Quick-start.html
+    - text: Models
+      href: articles/Models.html
+    - text: -------
+    - text: Articles
+      href: articles/Articles.html
+
+reference:
+- title: Data Preparation
+  contents:
+  - fe_data_prep
+- title: Estimation
+  contents:
+  - logis_fe
+  - SR_output
+- title: Coefficient and Confidence Interval
+  contents:
+  - coef.logis_fe
+  - confint.logis_fe
+- title: Hypothesis Testing
+  contents:
+  - test_fe
+  - summary_fe_covar
+- title: Example Data Set
+  contents:
+  - data_FE
