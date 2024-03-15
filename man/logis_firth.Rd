@@ -54,22 +54,6 @@ An object with S3 class \code{logis_fe}.
 \description{
 Main function for fitting fixed effects model with firth's bias correction
 }
-\details{
-The default algorithm is based on Serial blockwise inversion Newton (SerBIN) proposed by
-\href{https://onlinelibrary.wiley.com/doi/full/10.1002/sim.9387}{Wu et al. (2022)},
-but users can also choose to use the block ascent Newton (BAN) algorithm proposed by
-\href{https://link.springer.com/article/10.1007/s10985-013-9264-6}{He et al. (2013)} to fit the model.
-Both methodologies build upon the Newton-Raphson method, yet SerBIN simultaneously updates both the provider effect and covariate coefficient.
-This concurrent update necessitates the inversion of the complete information matrix at each iteration.
-In contrast, BAN adopts a two-layer updating approach, where the covariate coefficient is sequentially fixed to update the provider effect,
-followed by fixing the provider effect to update the covariate coefficient.
-
-We suggest using the default \code{"SerBIN"} option as it typically converges much faster for most datasets.
-However, in rare cases where the SerBIN algorithm encounters second-order derivative irreversibility leading to an error,
-users can consider using the \code{"BAN"} option as an alternative.
-
-For a deeper understanding, please consult the original article for detailed insights.
-}
 \examples{
 data(data_FE)
 data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID)
