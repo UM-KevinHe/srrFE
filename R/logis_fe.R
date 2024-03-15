@@ -63,7 +63,7 @@
 #'
 #' @examples
 #' data(data_FE)
-#' data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID, message = FALSE)
+#' data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID)
 #' fit_fe <- logis_fe(data.prep)
 #'
 #' @importFrom Rcpp evalCpp
@@ -88,22 +88,22 @@ logis_fe <- function(data.prep, algorithm = "SerBIN", max.iter = 10000, tol = 1e
                      backtrack = FALSE, Rcpp = TRUE, AUC = FALSE, message = FALSE){
   if (missing(data.prep)) stop ("Argument 'data.prep' is required!", call.=F)
   if (!class(data.prep) %in% c("data_prep")) stop("Object 'data.prep' should be generated from 'fe_data_prep' function!", call.=F)
-  
+
   if (!is.logical(backtrack)) stop("Argument 'backtrack' NOT as required!", call.=F)
-  
+
   data <- data.prep$data
   Y.char <- data.prep$char_list$Y.char
   prov.char <- data.prep$char_list$prov.char
   Z.char <- data.prep$char_list$Z.char
-  
+
   data <- data[data$included==1,]
   n.prov <- sapply(split(data[, Y.char], data[, prov.char]), length) # provider-specific number of discharges
   n.events.prov <- sapply(split(data[, Y.char], data[, prov.char]), sum) # provider-specific number of events
   Z <- as.matrix(data[,Z.char])
   gamma.prov <- rep(log(mean(data[,Y.char])/(1-mean(data[,Y.char]))), length(n.prov))
   beta <- rep(0, NCOL(Z))
-  
-  
+
+
   if (algorithm == "SerBIN") {
     if (Rcpp) { #Rcpp always use "backtrack"
       ls <- logis_BIN_fe_prov(as.matrix(data[,Y.char]),Z,n.prov,gamma.prov,beta,0,1,tol,max.iter, bound, message)
@@ -115,10 +115,10 @@ logis_fe <- function(data.prep, algorithm = "SerBIN", max.iter = 10000, tol = 1e
       if (message){
         message("Implementing SerBIN algorithm for fixed provider effects model ...")
       }
-      
+
       if (backtrack){ # initialize parameters for backtracking line search
-        s <- 0.01 
-        t <- 0.6 
+        s <- 0.01
+        t <- 0.6
         Loglkd <- function(gamma.obs, beta) {
           sum((gamma.obs+Z%*%beta)*data[,Y.char]-log(1+exp(gamma.obs+Z%*%beta)))
         }
@@ -137,7 +137,7 @@ logis_fe <- function(data.prep, algorithm = "SerBIN", max.iter = 10000, tol = 1e
         mat.tmp1 <- info.gamma.inv*t(info.betagamma) #J_1^T
         schur.inv <- solve(info.beta-info.betagamma%*%mat.tmp1) #S^-1
         mat.tmp2 <- mat.tmp1%*%schur.inv #J_2^T
-        
+
         d.gamma.prov <- info.gamma.inv*score.gamma +
           mat.tmp2%*%(t(mat.tmp1)%*%score.gamma-score.beta)
         d.beta <- -t(mat.tmp2)%*%score.gamma+schur.inv%*%score.beta
@@ -150,12 +150,14 @@ logis_fe <- function(data.prep, algorithm = "SerBIN", max.iter = 10000, tol = 1e
             v <- t * v
             d.loglkd <- Loglkd(rep(gamma.prov+v*d.gamma.prov, n.prov), beta+v*d.beta) - loglkd
           }
-        } 
+        }
         gamma.prov <- gamma.prov + v * d.gamma.prov
         gamma.prov <- pmin(pmax(gamma.prov, median(gamma.prov)-bound), median(gamma.prov)+bound)
         beta.new <- beta + v * d.beta
         beta.crit <- norm(matrix(beta-beta.new),"I") # stopping criterion
-        
+        beta <- beta.new
+
+
         if (message){
           if (backtrack){
             loglkd <- loglkd + d.loglkd
@@ -181,8 +183,8 @@ logis_fe <- function(data.prep, algorithm = "SerBIN", max.iter = 10000, tol = 1e
         message("Implementing BAN algorithm for fixed provider effects model ...")
       }
       if (backtrack){ # initialize parameters for backtracking line search
-        s <- 0.01 
-        t <- 0.8 
+        s <- 0.01
+        t <- 0.8
         Loglkd <- function(gamma.obs, beta) {
           sum((gamma.obs+Z%*%beta)*data[,Y.char]-log(1+exp(gamma.obs+Z%*%beta)))
         }
@@ -209,7 +211,7 @@ logis_fe <- function(data.prep, algorithm = "SerBIN", max.iter = 10000, tol = 1e
         gamma.prov <- gamma.prov + v * d.gamma.prov
         gamma.prov <- pmin(pmax(gamma.prov, median(gamma.prov)-bound), median(gamma.prov)+bound)
         gamma.obs <- rep(gamma.prov, n.prov)
-        
+
         # regression parameter update
         p <- c(plogis(gamma.obs+Z.beta)); pq <- p*(1-p)
         score.beta <- t(Z)%*%(data[,Y.char]-p)
@@ -228,7 +230,7 @@ logis_fe <- function(data.prep, algorithm = "SerBIN", max.iter = 10000, tol = 1e
         beta.new <- beta + v * d.beta
         beta.crit <- norm(matrix(beta-beta.new),"I") # stopping criterion
         beta <- beta.new
-        
+
         if (message){
           cat(paste0("Iter ",iter,": Inf norm of running diff in est reg parm is ",
                      formatC(beta.crit,digits=3,format="e"),";\n"))
@@ -241,29 +243,29 @@ logis_fe <- function(data.prep, algorithm = "SerBIN", max.iter = 10000, tol = 1e
   } else {
     stop("Argument 'algorithm' NOT as required!")
   }
-  
+
   gamma.obs <- rep(gamma.prov, n.prov)
   neg2Loglkd <- -2*sum((gamma.obs+Z%*%beta)*data[,Y.char]-log(1+exp(gamma.obs+Z%*%beta)))
   AIC <- neg2Loglkd + 2 * (length(gamma.prov)+length(beta))
   BIC <- neg2Loglkd + log(nrow(data)) * (length(gamma.prov)+length(beta))
-  
+
   df.prov <- data.frame(Obs_provider = sapply(split(data[,Y.char],data[,prov.char]),sum),
                         gamma_est = gamma.prov) #original gamma-hat, for internal using
-  
+
   # modify "outlier provider" to Inf or -Inf
   if (sum(n.events.prov==n.prov) != 0 | sum(n.events.prov==0) != 0) {
     gamma.prov[n.events.prov==n.prov] <- Inf
     gamma.prov[n.events.prov==0] <- -Inf
   }
-  
+
   #change output format
   beta <- matrix(beta)
   gamma.prov <- matrix(gamma.prov)
   dimnames(beta) <- list(Z.char, "beta")
   dimnames(gamma.prov) <- list(names(n.prov), "gamma")
-  
+
   char_list <- data.prep$char_list
-  
+
   return_ls <- structure(list(beta = beta,
                               gamma = gamma.prov, #provider effect
                               obs = data[, Y.char], #patient-level obs

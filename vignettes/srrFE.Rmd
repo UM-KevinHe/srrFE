@@ -86,6 +86,13 @@ Users most commonly utilize the output to obtain estimates of the provider effec
 coef(fit_fe)
 ```
 
+The firth's bias-corrected estimate can be obtained by using the `logis_firth()` function:
+
+```{r}
+fit_firth <- logis_firth(data.prep)
+coef(fit_firth)
+```
+
 ### Measures Output
 
 Based on the results obtained from the fitted model, users can easily calculate direct or indirect standardized rates and ratios as per their specific requirements. The `SR_output()` function simply necessitates the users to input the object returned from the `logis_fe()` function and specify the desired type of measure. By default, both indirect standardized rate and indirect standardized ratio will be provided.

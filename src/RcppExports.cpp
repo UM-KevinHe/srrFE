@@ -52,6 +52,29 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// logis_firth_prov
+List logis_firth_prov(arma::vec& Y, arma::mat& Z, arma::vec& n_prov, arma::vec gamma, arma::vec beta, int n_obs, int m, int parallel, int threads, double tol, int max_iter, double bound, bool message);
+RcppExport SEXP _srrFE_logis_firth_prov(SEXP YSEXP, SEXP ZSEXP, SEXP n_provSEXP, SEXP gammaSEXP, SEXP betaSEXP, SEXP n_obsSEXP, SEXP mSEXP, SEXP parallelSEXP, SEXP threadsSEXP, SEXP tolSEXP, SEXP max_iterSEXP, SEXP boundSEXP, SEXP messageSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec& >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type Z(ZSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type n_prov(n_provSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type gamma(gammaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< int >::type n_obs(n_obsSEXP);
+    Rcpp::traits::input_parameter< int >::type m(mSEXP);
+    Rcpp::traits::input_parameter< int >::type parallel(parallelSEXP);
+    Rcpp::traits::input_parameter< int >::type threads(threadsSEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    Rcpp::traits::input_parameter< int >::type max_iter(max_iterSEXP);
+    Rcpp::traits::input_parameter< double >::type bound(boundSEXP);
+    Rcpp::traits::input_parameter< bool >::type message(messageSEXP);
+    rcpp_result_gen = Rcpp::wrap(logis_firth_prov(Y, Z, n_prov, gamma, beta, n_obs, m, parallel, threads, tol, max_iter, bound, message));
+    return rcpp_result_gen;
+END_RCPP
+}
 // wald_covar
 List wald_covar(arma::vec& Y, arma::mat& Z, arma::vec& n_prov, arma::vec& gamma, arma::vec& beta, arma::uvec& indices, double null, double alpha);
 RcppExport SEXP _srrFE_wald_covar(SEXP YSEXP, SEXP ZSEXP, SEXP n_provSEXP, SEXP gammaSEXP, SEXP betaSEXP, SEXP indicesSEXP, SEXP nullSEXP, SEXP alphaSEXP) {
@@ -74,6 +97,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_srrFE_logis_fe_prov", (DL_FUNC) &_srrFE_logis_fe_prov, 10},
     {"_srrFE_logis_BIN_fe_prov", (DL_FUNC) &_srrFE_logis_BIN_fe_prov, 11},
+    {"_srrFE_logis_firth_prov", (DL_FUNC) &_srrFE_logis_firth_prov, 13},
     {"_srrFE_wald_covar", (DL_FUNC) &_srrFE_wald_covar, 8},
     {NULL, NULL, 0}
 };

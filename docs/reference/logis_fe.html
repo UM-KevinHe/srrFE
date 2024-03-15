@@ -177,7 +177,19 @@ users can consider using the <code>"BAN"</code> option as an alternative.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">data_FE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">data.prep</span> <span class="op">&lt;-</span> <span class="fu"><a href="fe_data_prep.html">fe_data_prep</a></span><span class="op">(</span><span class="va">data_FE</span><span class="op">$</span><span class="va">Y</span>, <span class="va">data_FE</span><span class="op">$</span><span class="va">Z</span>, <span class="va">data_FE</span><span class="op">$</span><span class="va">ID</span>, message <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">data.prep</span> <span class="op">&lt;-</span> <span class="fu"><a href="fe_data_prep.html">fe_data_prep</a></span><span class="op">(</span><span class="va">data_FE</span><span class="op">$</span><span class="va">Y</span>, <span class="va">data_FE</span><span class="op">$</span><span class="va">Z</span>, <span class="va">data_FE</span><span class="op">$</span><span class="va">ID</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking missingness of variables ... </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Missing values NOT found. Checking missingness of variables completed!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking variation in covariates ... </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking variation in covariates completed!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking pairwise correlation among covariates ... </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking pairwise correlation among covariates completed!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking VIF of covariates ... </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking VIF of covariates completed!</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>0 out of 10 providers considered small and filtered out!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 0 out of 10 remaining providers with no events.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 0 out of 10 remaining providers with all events.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> After screening, 52% of all records exhibit occurrences of events (Y = 1)</span>
 <span class="r-in"><span><span class="va">fit_fe</span> <span class="op">&lt;-</span> <span class="fu">logis_fe</span><span class="op">(</span><span class="va">data.prep</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

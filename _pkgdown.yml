@@ -37,6 +37,7 @@ reference:
 - title: Estimation
   contents:
   - logis_fe
+  - logis_firth
   - SR_output
 - title: Coefficient and Confidence Interval
   contents:

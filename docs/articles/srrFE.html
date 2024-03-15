@@ -77,7 +77,7 @@
       <img src="" class="logo" alt=""><h1>Getting Started with srrFE</h1>
                         <h4 data-toc-skip class="author">Yubo Shao</h4>
             
-            <h4 data-toc-skip class="date"><span style="font-style:normal;font-family:'Open Sans'">2024-03-14</span></h4>
+            <h4 data-toc-skip class="date"><span style="font-style:normal;font-family:'Open Sans'">2024-03-15</span></h4>
       
       <small class="dont-index">Source: <a href="https://github.com/UM-KevinHe/srrFE/blob/HEAD/vignettes/srrFE.Rmd" class="external-link"><code>vignettes/srrFE.Rmd</code></a></small>
       <div class="d-none name"><code>srrFE.Rmd</code></div>
@@ -137,17 +137,17 @@ body {
 <span><span class="co">#&gt; Checking VIF of covariates ...</span></span>
 <span><span class="co">#&gt; Checking VIF of covariates completed!</span></span>
 <span><span class="co">#&gt; Warning: 0 out of 10 providers considered small and filtered out!</span></span>
-<span><span class="co">#&gt; 0 out of 10 remaining providers with no readmission within 30 days.</span></span>
-<span><span class="co">#&gt; 0 out of 10 remaining providers with all readmissions within 30 days.</span></span>
-<span><span class="co">#&gt; After screening, 52% of all discharges were readmitted within 30 days.</span></span>
+<span><span class="co">#&gt; 0 out of 10 remaining providers with no events.</span></span>
+<span><span class="co">#&gt; 0 out of 10 remaining providers with all events.</span></span>
+<span><span class="co">#&gt; After screening, 52% of all records exhibit occurrences of events (Y = 1)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data.prep</span><span class="op">$</span><span class="va">data</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    Y ID      Z1      Z2      Z3      Z4 included no.readm all.readm</span></span>
-<span><span class="co">#&gt; 38 1  1 -0.7124  0.3953 -0.8402  0.0840        1        0         0</span></span>
-<span><span class="co">#&gt; 6  0  1  0.3660 -0.7654  1.8015 -0.5231        1        0         0</span></span>
-<span><span class="co">#&gt; 2  0  1 -0.0715  0.3307 -0.1121 -0.3115        1        0         0</span></span>
-<span><span class="co">#&gt; 32 1  1  1.2804 -0.7822  0.0941  0.7869        1        0         0</span></span>
-<span><span class="co">#&gt; 34 0  1  0.4012 -0.5114  0.3514 -0.8059        1        0         0</span></span>
-<span><span class="co">#&gt; 23 0  1  0.8727 -0.7320 -0.2893 -0.0106        1        0         0</span></span></code></pre></div>
+<span><span class="co">#&gt;    Y ID      Z1      Z2      Z3      Z4 included no.events all.events</span></span>
+<span><span class="co">#&gt; 38 1  1 -0.7124  0.3953 -0.8402  0.0840        1         0          0</span></span>
+<span><span class="co">#&gt; 6  0  1  0.3660 -0.7654  1.8015 -0.5231        1         0          0</span></span>
+<span><span class="co">#&gt; 2  0  1 -0.0715  0.3307 -0.1121 -0.3115        1         0          0</span></span>
+<span><span class="co">#&gt; 32 1  1  1.2804 -0.7822  0.0941  0.7869        1         0          0</span></span>
+<span><span class="co">#&gt; 34 0  1  0.4012 -0.5114  0.3514 -0.8059        1         0          0</span></span>
+<span><span class="co">#&gt; 23 0  1  0.8727 -0.7320 -0.2893 -0.0106        1         0          0</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="model-fitting">Model Fitting<a class="anchor" aria-label="anchor" href="#model-fitting"></a>
@@ -177,12 +177,35 @@ body {
 <span><span class="co">#&gt; Z2 -1.2672733</span></span>
 <span><span class="co">#&gt; Z3  0.5674081</span></span>
 <span><span class="co">#&gt; Z4  3.4980033</span></span></code></pre></div>
+<p>The firth’s bias-corrected estimate can be obtained by using the <code><a href="../reference/logis_firth.html">logis_firth()</a></code> function:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fit_firth</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/logis_firth.html">logis_firth</a></span><span class="op">(</span><span class="va">data.prep</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">fit_firth</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $gamma</span></span>
+<span><span class="co">#&gt;           gamma</span></span>
+<span><span class="co">#&gt; 1  -0.051239610</span></span>
+<span><span class="co">#&gt; 2   0.729490799</span></span>
+<span><span class="co">#&gt; 3  -1.308206549</span></span>
+<span><span class="co">#&gt; 4   2.367502062</span></span>
+<span><span class="co">#&gt; 5   0.256940614</span></span>
+<span><span class="co">#&gt; 6  -0.414020789</span></span>
+<span><span class="co">#&gt; 7   0.004970661</span></span>
+<span><span class="co">#&gt; 8   0.292270213</span></span>
+<span><span class="co">#&gt; 9   1.631117293</span></span>
+<span><span class="co">#&gt; 10 -0.033041718</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $beta</span></span>
+<span><span class="co">#&gt;          beta</span></span>
+<span><span class="co">#&gt; Z1 -2.1576804</span></span>
+<span><span class="co">#&gt; Z2 -1.1906649</span></span>
+<span><span class="co">#&gt; Z3  0.5328585</span></span>
+<span><span class="co">#&gt; Z4  3.2847309</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="measures-output">Measures Output<a class="anchor" aria-label="anchor" href="#measures-output"></a>
 </h3>
 <p>Based on the results obtained from the fitted model, users can easily calculate direct or indirect standardized rates and ratios as per their specific requirements. The <code><a href="../reference/SR_output.html">SR_output()</a></code> function simply necessitates the users to input the object returned from the <code><a href="../reference/logis_fe.html">logis_fe()</a></code> function and specify the desired type of measure. By default, both indirect standardized rate and indirect standardized ratio will be provided.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">SR</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SR_output.html">SR_output</a></span><span class="op">(</span><span class="va">fit_fe</span><span class="op">)</span></span>
 <span><span class="va">SR</span><span class="op">$</span><span class="va">indirect.rate</span></span>
 <span><span class="co">#&gt;    Indirect_standardized.rate</span></span>
@@ -213,7 +236,7 @@ body {
 <h3 id="hypothesis-testing-for-provider-effects">Hypothesis Testing for Provider Effects<a class="anchor" aria-label="anchor" href="#hypothesis-testing-for-provider-effects"></a>
 </h3>
 <p>The <code><a href="../reference/test_fe.html">test_fe()</a></code> function provides hypothesis testing outcomes to assist users in identifying outlier providers with extreme outcomes.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">test_poisbinom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/test_fe.html">test_fe</a></span><span class="op">(</span><span class="va">fit_fe</span><span class="op">)</span></span>
 <span><span class="va">test_poisbinom</span></span>
 <span><span class="co">#&gt;    flag            p       stat</span></span>
@@ -233,7 +256,7 @@ body {
 <h3 id="hypothesis-testing-for-covariate-coefficients">Hypothesis Testing for Covariate Coefficients<a class="anchor" aria-label="anchor" href="#hypothesis-testing-for-covariate-coefficients"></a>
 </h3>
 <p>Additionally, we offer the <code><a href="../reference/summary_fe_covar.html">summary_fe_covar()</a></code> function, which provides the test statistics for the covariate coefficients <span class="math inline">\(\beta\)</span>. The test statistics can be calculated by the “wald test” (use <code>"wald.cpp"</code> or <code>"wald"</code> option), “score test” (use <code>"score"</code> option), or “likelihood ratio test” (use <code>"lr"</code> option).</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/summary_fe_covar.html">summary_fe_covar</a></span><span class="op">(</span><span class="va">fit_fe</span><span class="op">)</span></span>
 <span><span class="co">#&gt;          beta   se.beta            p   CI.lower   CI.upper</span></span>
 <span><span class="co">#&gt; Z1 -2.2958595 0.2559326 2.950020e-19 -2.7974782 -1.7942409</span></span>
@@ -247,7 +270,7 @@ body {
 </h3>
 <p>The <code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint()</a></code> function can be used to provide the confidence intervals for the provider effects (i.e. <span class="math inline">\(\gamma_i\)</span>) for each providers selected to be tested. User needs to explicitly specify <code>option = "gamma"</code>.</p>
 <p>Users can choose the method for generating confidence intervals from either <code>"exact"</code>, <code>"wald"</code>, or <code>"score"</code> test. To maintain consistency between the confidence interval (CI) and the previous test results, it is advisable to use the same test option for both the <code><a href="../reference/test_fe.html">test_fe()</a></code> and <code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint()</a></code> functions. Please note that the <code>"exact"</code> option in the <code><a href="../reference/test_fe.html">test_fe()</a></code> function corresponds to the <code>"exact.poisbinom"</code> option in the <code><a href="../reference/test_fe.html">test_fe()</a></code> function.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">fit_fe</span>, option <span class="op">=</span> <span class="st">"gamma"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           gamma gamma.lower gamma.upper</span></span>
 <span><span class="co">#&gt; 1  -0.053509017  -0.9269014   0.8208674</span></span>
@@ -266,7 +289,7 @@ body {
 <h3 id="confidence-interval-for-measures">Confidence Interval for Measures<a class="anchor" aria-label="anchor" href="#confidence-interval-for-measures"></a>
 </h3>
 <p>For users interested in the CIs of direct/indirect standardized rates or ratios, the <code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint()</a></code> function can be also used for this purpose with explicitly specify <code>option = "SR"</code>. Additionally, users should input the object returned from the <code><a href="../reference/logis_fe.html">logis_fe()</a></code> function and specify the desired type of measure. By default, both indirect standardized rate and indirect standardized ratio will be provided.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="va">fit_fe</span>, option <span class="op">=</span> <span class="st">"SR"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $CI.indirect_ratio</span></span>
 <span><span class="co">#&gt;    indirect_ratio CI_ratio.lower CI_ratio.upper</span></span>
