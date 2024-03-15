@@ -12,10 +12,14 @@ vignettes:
   - vignettes/srrFE.Rmd
 
 authors:
+  Yubo Shao:
+    href: "https://mcommunity.umich.edu/person/ybshao"
   Kevin He:
     href: "https://www.um-kevinhe-group.org/"
   Wenbo Wu:
     href: "https://www.wenbowu.me/"
+  Tao Xu:
+    href: "https://mcommunity.umich.edu/person/taoxu/"
 
 navbar:
  components:

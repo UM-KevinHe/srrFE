@@ -27,7 +27,8 @@ See ["Models"](https://um-kevinhe.github.io/srrFE/articles/Models.html) or [orig
 
 ## Getting Help
 
-If you encounter any problems or bugs, please contact us at: [ybshao\@umich.edu](mailto:ybshao@umich.edu){.email}, [kevinhe\@umich.edu](mailto:kevinhe@umich.edu){.email}, [Wenbo.Wu\@nyulangone.org](mailto:Wenbo.Wu@nyulangone.org){.email}
+If you encounter any problems or bugs, please contact us at: [ybshao\@umich.edu](mailto:ybshao@umich.edu){.email}, [kevinhe\@umich.edu](mailto:kevinhe@umich.edu){.email}, [Wenbo.Wu\@nyulangone.org](mailto:Wenbo.Wu@nyulangone.org){.email},
+[taoxu\@med.umich.edu](mailto:taoxu@med.umich.edu){.email}
 
 ## References
 
