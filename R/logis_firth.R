@@ -75,7 +75,7 @@ logis_firth <- function(data.prep, max.iter = 10000, tol = 1e-5, bound = 10,
 
   if (Rcpp) { #Rcpp always use "backtrack"
     ls <- logis_firth_prov(as.matrix(data[,Y.char]),Z,n.prov,gamma.prov,beta,n.obs,m,
-                           0,1,tol,max.iter, bound, message)
+                           0,1,tol,max.iter, bound, message, backtrack)
     gamma.prov <- as.numeric(ls$gamma)
     beta <- as.numeric(ls$beta)
   } else {
@@ -138,13 +138,8 @@ logis_firth <- function(data.prep, max.iter = 10000, tol = 1e-5, bound = 10,
       beta <- beta.new
 
       if (message){
-        if (backtrack){
-          loglkd <- loglkd + d.loglkd
-          cat(paste0("Iter ",iter,": Inf norm of running diff in est reg parm is ",
-                     formatC(beta.crit,digits=3,format="e"),";\n"))
-        } else {
-          cat(paste0("Inf norm of running diff in est reg parm is ",formatC(beta.crit,digits=3,format="e"),";"))
-        }
+        cat(paste0("Iter ",iter,": Inf norm of running diff in est reg parm is ",
+                   formatC(beta.crit,digits=3,format="e"),";\n"))
       }
     }
     if (message == TRUE){

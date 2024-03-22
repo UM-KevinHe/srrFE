@@ -106,7 +106,8 @@ logis_fe <- function(data.prep, algorithm = "SerBIN", max.iter = 10000, tol = 1e
 
   if (algorithm == "SerBIN") {
     if (Rcpp) { #Rcpp always use "backtrack"
-      ls <- logis_BIN_fe_prov(as.matrix(data[,Y.char]),Z,n.prov,gamma.prov,beta,0,1,tol,max.iter, bound, message)
+      ls <- logis_BIN_fe_prov(as.matrix(data[,Y.char]),Z,n.prov,gamma.prov,beta,
+                              0,1,tol,max.iter, bound, message, backtrack)
       gamma.prov <- as.numeric(ls$gamma)
       beta <- as.numeric(ls$beta)
     } else {
@@ -159,13 +160,8 @@ logis_fe <- function(data.prep, algorithm = "SerBIN", max.iter = 10000, tol = 1e
 
 
         if (message){
-          if (backtrack){
-            loglkd <- loglkd + d.loglkd
-            cat(paste0("Iter ",iter,": Inf norm of running diff in est reg parm is ",
-                       formatC(beta.crit,digits=3,format="e"),";\n"))
-          } else {
-            cat(paste0("Inf norm of running diff in est reg parm is ",formatC(beta.crit,digits=3,format="e"),";"))
-          }
+          cat(paste0("Iter ",iter,": Inf norm of running diff in est reg parm is ",
+                     formatC(beta.crit,digits=3,format="e"),";"))
         }
       }
       if (message){

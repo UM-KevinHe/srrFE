@@ -202,17 +202,21 @@ List logis_fe_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec gamm
 // [[Rcpp::export]]
 List logis_BIN_fe_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec gamma, arma::vec beta,
                        int parallel=1, int threads=1, double tol=1e-8, int max_iter=10000,
-                       double bound=10.0, bool message = true) {
+                       double bound=10.0, bool message = true, bool backtrack = false) {
 
   int iter = 0, n = Z.n_rows, m = n_prov.n_elem, ind;
+  double v;
   arma::vec gamma_obs(n);
   double crit = 100.0;
   if (message == true) {
     cout << "Implementing SerBIN algorithm (Rcpp) for fixed provider effects model ..." << endl;
   }
-  double loglkd = Loglkd(Y, Z * beta, rep(gamma, n_prov)), d_loglkd, v, lambda, s = 0.01, t = 0.6;
+
+  double s = 0.01, t = 0.6; //only used for "backtrack = true"
+  double lambda, d_loglkd, loglkd;
   arma::vec gamma_obs_tmp(n), gamma_tmp(m), beta_tmp(Z.n_cols);
-  while (iter < max_iter) {
+
+  while (iter <= max_iter) {
     if (crit < tol) {
       break;
     }
@@ -244,33 +248,34 @@ List logis_BIN_fe_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec 
     arma::mat mat_tmp2 = mat_tmp1*schur_inv;
     arma::vec d_gamma = info_gamma_inv%score_gamma + mat_tmp2*(mat_tmp1.t()*score_gamma-score_beta);
     arma::vec d_beta = schur_inv*score_beta - mat_tmp2.t()*score_gamma;
+
+
     v = 1.0; // initialize step size
-    gamma_tmp = gamma + v * d_gamma;
-    gamma_obs_tmp = rep(gamma_tmp, n_prov);
-    arma::vec Z_beta_tmp = Z * (beta+v*d_beta);
-    d_loglkd = Loglkd(Y, Z_beta_tmp, gamma_obs_tmp) - loglkd;
-    lambda = dot(score_gamma, d_gamma) + dot(score_beta, d_beta);
-    while (d_loglkd < s*v*lambda) {
-      v = t*v;
+    if (backtrack == true){
+      loglkd = Loglkd(Y, Z * beta, rep(gamma, n_prov));
       gamma_tmp = gamma + v * d_gamma;
       gamma_obs_tmp = rep(gamma_tmp, n_prov);
-      Z_beta_tmp = Z * (beta+v*d_beta);
-      d_loglkd = Loglkd(Y, Z_beta_tmp, gamma_obs_tmp) - loglkd;
+      arma::vec Z_beta_tmp = Z * (beta+v*d_beta);
+      lambda = dot(score_gamma, d_gamma) + dot(score_beta, d_beta);
+      while (d_loglkd < s*v*lambda) {
+        v = t*v;
+        gamma_tmp = gamma + v * d_gamma;
+        gamma_obs_tmp = rep(gamma_tmp, n_prov);
+        Z_beta_tmp = Z * (beta+v*d_beta);
+        d_loglkd = Loglkd(Y, Z_beta_tmp, gamma_obs_tmp) - loglkd;
+      }
     }
     gamma += v * d_gamma;
     gamma = clamp(gamma, median(gamma)-bound, median(gamma)+bound);
     beta += v * d_beta;
-    loglkd += d_loglkd;
     crit = norm(v*d_beta, "inf");
 
     if (message == true) {
-      cout << "Iter " << iter << ": running diff = " << scientific << setprecision(5) << crit << ";";
-      cout << " loglkd = " << scientific << setprecision(5) << loglkd << ";" << endl;
+      cout << "Iter " << iter << ": Inf norm of running diff in est reg parm is " << scientific << setprecision(3) << crit << ";";
     }
   }
-
   if (message == true) {
-    cout << "serBIN (Rcpp) converged after " << iter << " iterations!" << endl;
+    cout << "serBIN (Rcpp) algorithm converged after " << iter << " iterations!" << endl;
   }
   List ret = List::create(_["gamma"]=gamma, _["beta"]=beta);
   return ret;
@@ -280,16 +285,20 @@ List logis_BIN_fe_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec 
 // [[Rcpp::export]]
 List logis_firth_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec gamma, arma::vec beta, int n_obs,
                       int m, int parallel=1, int threads=1, double tol=1e-8, int max_iter=10000,
-                      double bound=10.0, bool message = true) {
+                      double bound=10.0, bool message = true, bool backtrack = false) {
 
   int iter = 0, n = n_obs, ind;
+  double v;
   arma::vec gamma_obs(n);
   double crit = 100.0;
   if (message == true) {
     cout << "Implementing firth-corrected fixed provider effects model (Rcpp) ..." << endl;
   }
-  double loglkd = Loglkd(Y, Z * beta, rep(gamma, n_prov)), d_loglkd, v, lambda, s = 0.01, t = 0.6;
+
+  double s = 0.01, t = 0.6; //only used for "backtrack = true"
+  double lambda, d_loglkd, loglkd;
   arma::vec gamma_obs_tmp(n), gamma_tmp(m), beta_tmp(Z.n_cols);
+
   while (iter < max_iter) {
     if (crit < tol) {
       break;
@@ -302,7 +311,6 @@ List logis_firth_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec g
     arma::vec score_gamma(m), info_gamma_inv(m);
     arma::mat info_betagamma(Z.n_cols,m);
 
-
     ind = 0;
     for (int i = 0; i < m; i++) {
       info_gamma_inv(i) = 1 / sum(pq(span(ind,ind+n_prov(i)-1)));
@@ -310,7 +318,6 @@ List logis_firth_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec g
         sum(Z.rows(ind,ind+n_prov(i)-1).each_col()%(p.subvec(ind,ind+n_prov(i)-1)%(1-p.subvec(ind,ind+n_prov(i)-1)))).t();
       ind += n_prov(i);
     }
-    //arma::vec score_beta = Z.t() * Yp;
     arma::mat info_beta(Z.n_cols, Z.n_cols);
     if (parallel==1) { // parallel
       info_beta = info_beta_omp(Z, pq, threads); // omp
@@ -351,19 +358,21 @@ List logis_firth_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec g
     arma::vec d_gamma = info_gamma_inv%score_gamma + mat_tmp2*(mat_tmp1.t()*score_gamma-score_beta);
     arma::vec d_beta = schur_inv*score_beta - mat_tmp2.t()*score_gamma;
     v = 1.0; // initialize step size
-    gamma_tmp = gamma + v * d_gamma;
-    gamma_obs_tmp = rep(gamma_tmp, n_prov);
-    arma::vec Z_beta_tmp = Z * (beta+v*d_beta);
-    d_loglkd = Loglkd(Y, Z_beta_tmp, gamma_obs_tmp) - loglkd;
-    lambda = dot(score_gamma, d_gamma) + dot(score_beta, d_beta);
-    while (d_loglkd < s*v*lambda) {
-      v = t*v;
+    if (backtrack == true){
+      loglkd = Loglkd(Y, Z * beta, rep(gamma, n_prov));
       gamma_tmp = gamma + v * d_gamma;
       gamma_obs_tmp = rep(gamma_tmp, n_prov);
-      Z_beta_tmp = Z * (beta+v*d_beta);
+      arma::vec Z_beta_tmp = Z * (beta+v*d_beta);
       d_loglkd = Loglkd(Y, Z_beta_tmp, gamma_obs_tmp) - loglkd;
+      lambda = dot(score_gamma, d_gamma) + dot(score_beta, d_beta);
+      while (d_loglkd < s*v*lambda) {
+        v = t*v;
+        gamma_tmp = gamma + v * d_gamma;
+        gamma_obs_tmp = rep(gamma_tmp, n_prov);
+        Z_beta_tmp = Z * (beta+v*d_beta);
+        d_loglkd = Loglkd(Y, Z_beta_tmp, gamma_obs_tmp) - loglkd;
+      }
     }
-
     gamma += v * d_gamma;
     gamma = clamp(gamma, median(gamma)-bound, median(gamma)+bound);
     beta += v * d_beta;
@@ -371,11 +380,9 @@ List logis_firth_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec g
     crit = norm(v*d_beta, "inf");
 
     if (message == true) {
-      cout << "Iter " << iter << ": running diff = " << scientific << setprecision(5) << crit << ";";
-      cout << " loglkd = " << scientific << setprecision(5) << loglkd << ";" << endl;
+      cout << "Iter " << iter << ": Inf norm of running diff in est reg parm is " << scientific << setprecision(3) << crit << ";";
     }
   }
-
   if (message == true) {
     cout << "Algorithm converged after " << iter << " iterations!" << endl;
   }
