@@ -14,6 +14,8 @@ using namespace Rcpp;
 using namespace std;
 using namespace arma;
 
+//` @importFrom RcppParallel RcppParallelLibs
+
 arma::vec rep(arma::vec &x, arma::vec &each) {
   arma::vec x_rep(sum(each));
   int ind = 0, m = x.n_elem;
