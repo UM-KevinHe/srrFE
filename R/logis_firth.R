@@ -44,6 +44,7 @@
 #'
 #' @importFrom Rcpp evalCpp
 #' @importFrom pROC auc
+#' @importFrom RcppParallel RcppParallelLibs
 #'
 #'
 #' @keywords Fixed Provider Effects, Firth Correction
@@ -52,7 +53,7 @@
 #'
 #'
 logis_firth <- function(data.prep, max.iter = 10000, tol = 1e-5, bound = 10,
-                        backtrack = FALSE, Rcpp = TRUE, AUC = FALSE, message = FALSE){
+                        backtrack = TRUE, Rcpp = TRUE, AUC = FALSE, message = FALSE){
   if (missing(data.prep)) stop ("Argument 'data.prep' is required!", call.=F)
   if (!class(data.prep) %in% c("data_prep")) stop("Object 'data.prep' should be generated from 'fe_data_prep' function!", call.=F)
 
@@ -74,8 +75,9 @@ logis_firth <- function(data.prep, max.iter = 10000, tol = 1e-5, bound = 10,
 
 
   if (Rcpp) { #Rcpp always use "backtrack"
-    ls <- logis_firth_prov(as.matrix(data[,Y.char]),Z,n.prov,gamma.prov,beta,n.obs,m,
-                           0,1,tol,max.iter, bound, message, backtrack)
+    ls <- logis_firth_prov(as.matrix(data[, Y.char]), Z, n.prov, gamma.prov, beta,
+                           n.obs, m, 0, 1, tol, max.iter,
+                           bound, message, backtrack)
     gamma.prov <- as.numeric(ls$gamma)
     beta <- as.numeric(ls$beta)
   } else {
@@ -154,12 +156,13 @@ logis_firth <- function(data.prep, max.iter = 10000, tol = 1e-5, bound = 10,
 
   df.prov <- data.frame(Obs_provider = sapply(split(data[,Y.char],data[,prov.char]),sum),
                         gamma_est = gamma.prov) #original gamma-hat, for internal using
+  pred <- as.numeric(plogis(gamma.obs+Z%*%beta))
 
   # modify "outlier provider" to Inf or -Inf
-  if (sum(n.events.prov==n.prov) != 0 | sum(n.events.prov==0) != 0) {
-    gamma.prov[n.events.prov==n.prov] <- Inf
-    gamma.prov[n.events.prov==0] <- -Inf
-  }
+  # if (sum(n.events.prov==n.prov) != 0 | sum(n.events.prov==0) != 0) {
+  #   gamma.prov[n.events.prov==n.prov] <- Inf
+  #   gamma.prov[n.events.prov==0] <- -Inf
+  # }
 
   #change output format
   beta <- matrix(beta)
@@ -171,14 +174,14 @@ logis_firth <- function(data.prep, max.iter = 10000, tol = 1e-5, bound = 10,
 
   return_ls <- structure(list(beta = beta,
                               gamma = gamma.prov, #provider effect
+                              pred = pred, #predicted probability
                               obs = data[, Y.char], #patient-level obs
                               neg2Loglkd = neg2Loglkd,
                               AIC = AIC,
                               BIC = BIC),
                          class = "logis_fe")
   if (AUC) {
-    Pred <- as.numeric(plogis(gamma.obs+Z%*%beta))
-    AUC <- pROC::auc(data[,Y.char], Pred)
+    AUC <- pROC::auc(data[,Y.char], pred)
     return_ls$AUC <- AUC[1]
   }
   return_ls$df.prov <- df.prov
