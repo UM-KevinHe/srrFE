@@ -120,7 +120,7 @@ SR_output <- function(fit, stdz = "indirect", measure = c("rate", "ratio"), null
   if (sum(n.events.prov==n.prov) != 0 | sum(n.events.prov==0) != 0) {
     if ("direct" %in% stdz) { #only "direct standardized rates/ratios" are affected
       if ("ratio" %in% measure){
-        direct_stdz.ratio[n.events.prov==n.prov,] <- length(gamma.obs) / sum(df.prov$Obs_all)
+        direct_stdz.ratio[n.events.prov==n.prov,] <- length(gamma.obs) / df.prov$Obs_all
         direct_stdz.ratio[n.events.prov==0,] <- 0
       }
       if ("rate" %in% measure){
