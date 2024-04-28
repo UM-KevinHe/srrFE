@@ -9,7 +9,7 @@ logis_firth(
   max.iter = 10000,
   tol = 1e-05,
   bound = 10,
-  backtrack = FALSE,
+  backtrack = TRUE,
   Rcpp = TRUE,
   AUC = FALSE,
   message = FALSE

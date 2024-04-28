@@ -68,6 +68,7 @@
 #'
 #' @importFrom Rcpp evalCpp
 #' @importFrom pROC auc
+#' @importFrom RcppParallel RcppParallelLibs
 #'
 #' @references
 #' \itemize{
@@ -85,7 +86,7 @@
 #'
 
 logis_fe <- function(data.prep, algorithm = "SerBIN", max.iter = 10000, tol = 1e-5, bound = 10,
-                     backtrack = FALSE, Rcpp = TRUE, AUC = FALSE, message = FALSE){
+                     backtrack = TRUE, Rcpp = TRUE, AUC = FALSE, message = FALSE){
   if (missing(data.prep)) stop ("Argument 'data.prep' is required!", call.=F)
   if (!class(data.prep) %in% c("data_prep")) stop("Object 'data.prep' should be generated from 'fe_data_prep' function!", call.=F)
 
@@ -247,12 +248,13 @@ logis_fe <- function(data.prep, algorithm = "SerBIN", max.iter = 10000, tol = 1e
 
   df.prov <- data.frame(Obs_provider = sapply(split(data[,Y.char],data[,prov.char]),sum),
                         gamma_est = gamma.prov) #original gamma-hat, for internal using
+  pred <- as.numeric(plogis(gamma.obs+Z%*%beta))
 
   # modify "outlier provider" to Inf or -Inf
-  if (sum(n.events.prov==n.prov) != 0 | sum(n.events.prov==0) != 0) {
-    gamma.prov[n.events.prov==n.prov] <- Inf
-    gamma.prov[n.events.prov==0] <- -Inf
-  }
+  # if (sum(n.events.prov==n.prov) != 0 | sum(n.events.prov==0) != 0) {
+  #   gamma.prov[n.events.prov==n.prov] <- Inf
+  #   gamma.prov[n.events.prov==0] <- -Inf
+  # }
 
   #change output format
   beta <- matrix(beta)
@@ -264,14 +266,14 @@ logis_fe <- function(data.prep, algorithm = "SerBIN", max.iter = 10000, tol = 1e
 
   return_ls <- structure(list(beta = beta,
                               gamma = gamma.prov, #provider effect
+                              pred = pred, #predicted probability
                               obs = data[, Y.char], #patient-level obs
                               neg2Loglkd = neg2Loglkd,
                               AIC = AIC,
                               BIC = BIC),
                          class = "logis_fe")
   if (AUC) {
-    Pred <- as.numeric(plogis(gamma.obs+Z%*%beta))
-    AUC <- pROC::auc(data[,Y.char], Pred)
+    AUC <- pROC::auc(data[,Y.char], pred)
     return_ls$AUC <- AUC[1]
   }
   return_ls$df.prov <- df.prov
