@@ -102,7 +102,8 @@ SR_output <- function(fit, stdz = "indirect", measure = c("rate", "ratio"), null
     Exp.direct <- function(gamma, Z_beta) {
       sum(as.numeric(plogis(gamma + Z_beta)))
     }
-    Exp <- sapply(gamma.prov, Exp.direct, Z_beta = Z%*%beta)  #numerator
+    Z_beta <- Z %*% beta #common across providers
+    Exp <- sapply(gamma.prov, Exp.direct, Z_beta = Z_beta)  #numerator
     df.prov <- data.frame(Obs_all = rep(sum(data[,Y.char]), length(gamma.prov)), #denominator
                           Exp.direct_all = Exp)  #numerator
     OE_direct <- df.prov
