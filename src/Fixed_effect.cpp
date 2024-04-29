@@ -63,7 +63,7 @@ void ind2uppsub(unsigned int index, unsigned int dim, unsigned int &row, unsigne
   }
 }
 
-arma::mat info_beta_omp(const arma::mat &Z, const vec &pq, const int &threads) {
+arma::mat info_beta_omp(const arma::mat &Z, const arma::vec &pq, const int &threads) {
   omp_set_num_threads(threads);
   unsigned int p = Z.n_cols;
   unsigned int loops = p * (1 + p) / 2;
@@ -82,6 +82,34 @@ double Loglkd(const arma::vec &Y, const arma::vec &Z_beta, const arma::vec &gamm
   return sum((gamma_obs+Z_beta)%Y-log(1+exp(gamma_obs+Z_beta)));
 }
 
+double logist(double x) {
+    return 1.0 / (1.0 + exp(-x));
+}
+
+double Exp_direct(double gamma, const arma::vec& Z_beta) {
+    double sum = 0.0;
+
+    #pragma omp parallel for reduction(+:sum)
+    for (unsigned int i = 0; i < Z_beta.n_elem; ++i) {
+        sum += logist(gamma + Z_beta[i]);
+    }
+
+    return sum;
+}
+
+
+// [[Rcpp::export]]
+arma::vec computeDirectExp(const arma::vec& gamma_prov, const arma::vec& Z_beta, const int &threads) {
+    omp_set_num_threads(threads);
+    arma::vec results(gamma_prov.n_elem);
+
+    #pragma omp parallel for schedule(static)
+    for (unsigned int i = 0; i < gamma_prov.n_elem; ++i) {
+        results[i] = Exp_direct(gamma_prov[i], Z_beta);
+    }
+
+    return results;
+}
 
 // [[Rcpp::export]]
 List logis_fe_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec gamma, arma::vec beta, int backtrack=0,

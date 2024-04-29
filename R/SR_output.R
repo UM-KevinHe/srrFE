@@ -17,6 +17,10 @@
 #'
 #' @param null if "stdz = indirect", a character string or real number specifying null hypotheses of fixed provider effects for calculating standardized rate/ratio. Defaulting to "median".
 #'
+#' @param Rcpp a boolean indicating whether to use Rcpp. Defaulting to TRUE.
+#'
+#' @param threads an integer specifying the number of threads to use. Defaulting to 4.
+#'
 #' @param ...
 #'
 #'
@@ -42,8 +46,8 @@
 #' data(data_FE)
 #' data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID, message = FALSE)
 #' fit_fe <- logis_fe(data.prep)
-#' SR <- SR_output(fit_fe, stdz = "indirect", measure = "ratio")
-#' SR$indirect.ratio
+#' SR <- SR_output(fit_fe, stdz = "direct", measure = "rate")
+#' SR$direct.rate
 #'
 #' @references
 #' \itemize{
@@ -54,11 +58,10 @@
 #' @export
 
 
-SR_output <- function(fit, stdz = "indirect", measure = c("rate", "ratio"), null = "median"){
+SR_output <- function(fit, stdz = "indirect", measure = c("rate", "ratio"), null = "median",
+                      Rcpp = TRUE, threads = 4, ...){
   if (missing(fit)) stop ("Argument 'fit' is required!", call.=F)
   if (!class(fit) %in% c("logis_fe")) stop("Object fit is not of the classes 'logis_fe'!", call.=F)
-
-
 
   if (!"indirect" %in% stdz & !"direct" %in% stdz){
     stop("Argument 'stdz' NOT as required!",call.=F)
@@ -99,11 +102,23 @@ SR_output <- function(fit, stdz = "indirect", measure = c("rate", "ratio"), null
   }
 
   if ("direct" %in% stdz) {
-    Exp.direct <- function(gamma, Z_beta) {
-      sum(as.numeric(plogis(gamma + Z_beta)))
+    Z_beta <- Z %*% beta
+    if (Rcpp) {
+      # t1 <- Sys.time()
+      Exp <- computeDirectExp(gamma.prov, Z_beta, threads)
+      # time1 <- Sys.time() - t1
+    } else {
+      # t2 <- Sys.time()
+      exp_ZB <- exp(Z_beta)
+      Exp.direct <- function(gamma){
+        numer <- exp(gamma) * exp_ZB
+        sum(1/(1 + 1/numer))
+      }
+      Exp <- sapply(gamma.prov, Exp.direct)
+      # time2 <- Sys.time() - t2
     }
-    Z_beta <- Z %*% beta #common across providers
-    Exp <- sapply(gamma.prov, Exp.direct, Z_beta = Z_beta)  #numerator
+
+
     df.prov <- data.frame(Obs_all = rep(sum(data[,Y.char]), length(gamma.prov)), #denominator
                           Exp.direct_all = Exp)  #numerator
     OE_direct <- df.prov

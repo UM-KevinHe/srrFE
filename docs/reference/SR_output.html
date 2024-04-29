@@ -64,7 +64,10 @@
 <span>  <span class="va">fit</span>,</span>
 <span>  stdz <span class="op">=</span> <span class="st">"indirect"</span>,</span>
 <span>  measure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"rate"</span>, <span class="st">"ratio"</span><span class="op">)</span>,</span>
-<span>  null <span class="op">=</span> <span class="st">"median"</span></span>
+<span>  null <span class="op">=</span> <span class="st">"median"</span>,</span>
+<span>  Rcpp <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  threads <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -88,6 +91,14 @@
 
 <dt>null</dt>
 <dd><p>if "stdz = indirect", a character string or real number specifying null hypotheses of fixed provider effects for calculating standardized rate/ratio. Defaulting to "median".</p></dd>
+
+
+<dt>Rcpp</dt>
+<dd><p>a boolean indicating whether to use Rcpp. Defaulting to TRUE.</p></dd>
+
+
+<dt>threads</dt>
+<dd><p>an integer specifying the number of threads to use. Defaulting to 4.</p></dd>
 
 
 <dt>...</dt>
@@ -132,19 +143,19 @@ Users are allowed to specify <code>"stdz = c("indirect", "direct")"</code> or <c
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">data_FE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">data.prep</span> <span class="op">&lt;-</span> <span class="fu"><a href="fe_data_prep.html">fe_data_prep</a></span><span class="op">(</span><span class="va">data_FE</span><span class="op">$</span><span class="va">Y</span>, <span class="va">data_FE</span><span class="op">$</span><span class="va">Z</span>, <span class="va">data_FE</span><span class="op">$</span><span class="va">ID</span>, message <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">fit_fe</span> <span class="op">&lt;-</span> <span class="fu"><a href="logis_fe.html">logis_fe</a></span><span class="op">(</span><span class="va">data.prep</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">SR</span> <span class="op">&lt;-</span> <span class="fu">SR_output</span><span class="op">(</span><span class="va">fit_fe</span>, stdz <span class="op">=</span> <span class="st">"indirect"</span>, measure <span class="op">=</span> <span class="st">"ratio"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">SR</span><span class="op">$</span><span class="va">indirect.ratio</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Indirect_standardized.ratio</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                    0.9519563</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                    1.1043247</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3                    0.6849708</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4                    1.2706751</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                    1.0179583</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6                    0.8865274</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7                    0.9653378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8                    1.0212087</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9                    1.1944943</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10                   0.9690691</span>
+<span class="r-in"><span><span class="va">SR</span> <span class="op">&lt;-</span> <span class="fu">SR_output</span><span class="op">(</span><span class="va">fit_fe</span>, stdz <span class="op">=</span> <span class="st">"direct"</span>, measure <span class="op">=</span> <span class="st">"rate"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">SR</span><span class="op">$</span><span class="va">direct.rate</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Direct_standardized.rate</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                  49.27094</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                  56.46127</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                  37.79631</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                  71.31486</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                  52.11158</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                  45.94477</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7                  49.81051</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8                  52.38627</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9                  64.71905</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10                 49.43288</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

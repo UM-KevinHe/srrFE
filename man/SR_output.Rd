@@ -8,7 +8,10 @@ SR_output(
   fit,
   stdz = "indirect",
   measure = c("rate", "ratio"),
-  null = "median"
+  null = "median",
+  Rcpp = TRUE,
+  threads = 4,
+  ...
 )
 }
 \arguments{
@@ -27,6 +30,10 @@ SR_output(
 }}
 
 \item{null}{if "stdz = indirect", a character string or real number specifying null hypotheses of fixed provider effects for calculating standardized rate/ratio. Defaulting to "median".}
+
+\item{Rcpp}{a boolean indicating whether to use Rcpp. Defaulting to TRUE.}
+
+\item{threads}{an integer specifying the number of threads to use. Defaulting to 4.}
 
 \item{...}{}
 }
@@ -52,8 +59,8 @@ Users are allowed to specify \verb{"stdz = c("indirect", "direct")"} or \verb{"m
 data(data_FE)
 data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID, message = FALSE)
 fit_fe <- logis_fe(data.prep)
-SR <- SR_output(fit_fe, stdz = "indirect", measure = "ratio")
-SR$indirect.ratio
+SR <- SR_output(fit_fe, stdz = "direct", measure = "rate")
+SR$direct.rate
 
 }
 \references{

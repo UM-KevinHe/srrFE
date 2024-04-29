@@ -11,6 +11,19 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// computeDirectExp
+arma::vec computeDirectExp(const arma::vec& gamma_prov, const arma::vec& Z_beta, const int& threads);
+RcppExport SEXP _srrFE_computeDirectExp(SEXP gamma_provSEXP, SEXP Z_betaSEXP, SEXP threadsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type gamma_prov(gamma_provSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type Z_beta(Z_betaSEXP);
+    Rcpp::traits::input_parameter< const int& >::type threads(threadsSEXP);
+    rcpp_result_gen = Rcpp::wrap(computeDirectExp(gamma_prov, Z_beta, threads));
+    return rcpp_result_gen;
+END_RCPP
+}
 // logis_fe_prov
 List logis_fe_prov(arma::vec& Y, arma::mat& Z, arma::vec& n_prov, arma::vec gamma, arma::vec beta, int backtrack, int max_iter, double bound, double tol, bool message);
 RcppExport SEXP _srrFE_logis_fe_prov(SEXP YSEXP, SEXP ZSEXP, SEXP n_provSEXP, SEXP gammaSEXP, SEXP betaSEXP, SEXP backtrackSEXP, SEXP max_iterSEXP, SEXP boundSEXP, SEXP tolSEXP, SEXP messageSEXP) {
@@ -97,6 +110,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_srrFE_computeDirectExp", (DL_FUNC) &_srrFE_computeDirectExp, 3},
     {"_srrFE_logis_fe_prov", (DL_FUNC) &_srrFE_logis_fe_prov, 10},
     {"_srrFE_logis_BIN_fe_prov", (DL_FUNC) &_srrFE_logis_BIN_fe_prov, 12},
     {"_srrFE_logis_firth_prov", (DL_FUNC) &_srrFE_logis_firth_prov, 14},
