@@ -86,7 +86,8 @@
 #'
 
 logis_fe <- function(data.prep, algorithm = "SerBIN", max.iter = 10000, tol = 1e-5, bound = 10,
-                     backtrack = TRUE, Rcpp = TRUE, AUC = FALSE, message = FALSE){
+                     backtrack = TRUE, Rcpp = TRUE, AUC = FALSE, message = FALSE,
+                     stop = "beta"){
   if (missing(data.prep)) stop ("Argument 'data.prep' is required!", call.=F)
   if (!class(data.prep) %in% c("data_prep")) stop("Object 'data.prep' should be generated from 'fe_data_prep' function!", call.=F)
 
@@ -104,11 +105,10 @@ logis_fe <- function(data.prep, algorithm = "SerBIN", max.iter = 10000, tol = 1e
   gamma.prov <- rep(log(mean(data[,Y.char])/(1-mean(data[,Y.char]))), length(n.prov))
   beta <- rep(0, NCOL(Z))
 
-
   if (algorithm == "SerBIN") {
     if (Rcpp) { #Rcpp always use "backtrack"
       ls <- logis_BIN_fe_prov(as.matrix(data[,Y.char]),Z,n.prov,gamma.prov,beta,
-                              0,1,tol,max.iter, bound, message, backtrack)
+                              0,1,tol,max.iter, bound, message, backtrack, stop)
       gamma.prov <- as.numeric(ls$gamma)
       beta <- as.numeric(ls$beta)
     } else {
