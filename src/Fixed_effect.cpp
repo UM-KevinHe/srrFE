@@ -317,7 +317,7 @@ List logis_BIN_fe_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec 
     else if (stop == "ratch") {
       crit = abs(d_loglkd/(d_loglkd+loglkd-loglkd_init));
     }
-    } else if (stop == "all") {
+    else if (stop == "all") {
       arma::vec crits(3);
       crits(0) = norm(v*d_beta, "inf");
       crits(1) = abs(d_loglkd/(d_loglkd+loglkd));
