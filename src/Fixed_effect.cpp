@@ -6,6 +6,9 @@
 // [[Rcpp::depends(RcppArmadillo)]]
 #include <cmath>
 #include <omp.h>
+#include <mach/mach.h>
+
+
 
 // [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::plugins(openmp)]]
@@ -84,7 +87,36 @@ double Loglkd(const arma::vec &Y, const arma::vec &Z_beta, const arma::vec &gamm
 
 
 // [[Rcpp::export]]
-List logis_fe_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec gamma, arma::vec beta, int backtrack=0,
+void checkMemoryUsage() {
+  mach_task_basic_info info;
+  mach_msg_type_number_t infoCount = MACH_TASK_BASIC_INFO_COUNT;
+
+  if (task_info(mach_task_self(), MACH_TASK_BASIC_INFO,
+                (task_info_t)&info, &infoCount) != KERN_SUCCESS) {
+    Rcpp::Rcout << "Failed to get memory info." << std::endl;
+    return;
+  }
+
+  Rcpp::Rcout << "Memory used: " << info.resident_size << " bytes" << std::endl;
+
+  arma::vec testvec = arma::zeros<arma::vec>(100000);
+  for (int i=0; i<100000; i++){
+    testvec(i) = 1;
+  }
+
+  if (task_info(mach_task_self(), MACH_TASK_BASIC_INFO,
+                (task_info_t)&info, &infoCount) != KERN_SUCCESS) {
+    Rcpp::Rcout << "Failed to get memory info." << std::endl;
+    return;
+  }
+
+  Rcpp::Rcout << "Memory used: " << info.resident_size << " bytes" << std::endl;
+
+}
+
+
+// [[Rcpp::export]]
+List logis_fe_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec gamma, arma::vec beta, int backtrack=1,
                    int max_iter=10000, double bound=10.0, double tol=1e-5, bool message = true) {
 
   int iter = 0, n = Z.n_rows, m = n_prov.n_elem, ind;
@@ -202,18 +234,20 @@ List logis_fe_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec gamm
 // [[Rcpp::export]]
 List logis_BIN_fe_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec gamma, arma::vec beta,
                        int parallel=1, int threads=1, double tol=1e-8, int max_iter=10000,
-                       double bound=10.0, bool message = true, bool backtrack = false) {
+                       double bound=10.0, bool message = true, bool backtrack = false, const std::string stop = "beta") {
+
+  Rcout << "start" << endl;
 
   int iter = 0, n = Z.n_rows, m = n_prov.n_elem, ind;
   double v;
   arma::vec gamma_obs(n);
   double crit = 100.0;
   if (message == true) {
-    cout << "Implementing SerBIN algorithm (Rcpp) for fixed provider effects model ..." << endl;
+    Rcout << "Implementing SerBIN algorithm (Rcpp) for fixed provider effects model ..." << endl;
   }
 
   double s = 0.01, t = 0.6; //only used for "backtrack = true"
-  double lambda, d_loglkd, loglkd;
+  double lambda, d_loglkd, loglkd, loglkd_init;
   arma::vec gamma_obs_tmp(n), gamma_tmp(m), beta_tmp(Z.n_cols);
 
   while (iter <= max_iter) {
@@ -235,6 +269,7 @@ List logis_BIN_fe_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec 
         sum(Z.rows(ind,ind+n_prov(i)-1).each_col()%(p.subvec(ind,ind+n_prov(i)-1)%(1-p.subvec(ind,ind+n_prov(i)-1)))).t();
       ind += n_prov(i);
     }
+
     arma::vec score_beta = Z.t() * Yp;
     arma::mat info_beta(Z.n_cols, Z.n_cols);
     if (parallel==1) { // parallel
@@ -249,6 +284,10 @@ List logis_BIN_fe_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec 
     arma::vec d_gamma = info_gamma_inv%score_gamma + mat_tmp2*(mat_tmp1.t()*score_gamma-score_beta);
     arma::vec d_beta = schur_inv*score_beta - mat_tmp2.t()*score_gamma;
 
+    // List ret = List::create(_["score_gamma"]=score_gamma,
+    //                         _["info_gamma_inv"]=info_gamma_inv,
+    //                         _["d_beta"]=d_beta);
+    // return ret;
 
     v = 1.0; // initialize step size
     if (backtrack == true){
@@ -265,10 +304,26 @@ List logis_BIN_fe_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec 
         d_loglkd = Loglkd(Y, Z_beta_tmp, gamma_obs_tmp) - loglkd;
       }
     }
+    if (iter == 1) loglkd_init = loglkd;
     gamma += v * d_gamma;
     gamma = clamp(gamma, median(gamma)-bound, median(gamma)+bound);
     beta += v * d_beta;
-    crit = norm(v*d_beta, "inf");
+    if (stop == "beta"){
+      crit = norm(v*d_beta, "inf");
+    }
+    else if (stop == "relch") {
+      crit = abs(d_loglkd/(d_loglkd+loglkd));
+    }
+    else if (stop == "ratch") {
+      crit = abs(d_loglkd/(d_loglkd+loglkd-loglkd_init));
+    }
+    } else if (stop == "all") {
+      arma::vec crits(3);
+      crits(0) = norm(v*d_beta, "inf");
+      crits(1) = abs(d_loglkd/(d_loglkd+loglkd));
+      crits(2) = abs(d_loglkd/(d_loglkd+loglkd-loglkd_init));
+      crit = crits.max();
+    }
 
     if (message == true) {
       cout << "Iter " << iter << ": Inf norm of running diff in est reg parm is " << scientific << setprecision(3) << crit << ";";
@@ -421,3 +476,25 @@ List wald_covar(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec &gamma,
   ret["beta.upper"] = beta(indices) + R::qnorm5(1-alpha/2,0,1,true,false)*se_beta(indices);
   return ret;
 }
+
+
+
+
+
+// double Exp_direct(double gamma, const arma::vec& Z_beta) {
+//   arma::vec logist_vals = 1.0 / (1.0 + exp(-(gamma + Z_beta)));
+//   return arma::accu(logist_vals);
+// }
+//
+// // [[Rcpp::export]]
+// arma::vec computeDirectExp(const arma::vec& gamma_prov, const arma::vec& Z_beta, const int &threads) {
+//   omp_set_num_threads(threads);
+//   arma::vec results(gamma_prov.n_elem);
+//
+//   #pragma omp parallel for schedule(static)
+//   for (unsigned int i = 0; i < gamma_prov.n_elem; ++i) {
+//     results[i] = Exp_direct(gamma_prov[i], Z_beta);
+//   }
+//
+//   return results;
+// }
