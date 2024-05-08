@@ -107,7 +107,6 @@ arma::vec computeDirectExp(const arma::vec& gamma_prov, const arma::vec& Z_beta,
     for (unsigned int i = 0; i < gamma_prov.n_elem; ++i) {
         results[i] = Exp_direct(gamma_prov[i], Z_beta);
     }
-
     return results;
 }
 
@@ -448,4 +447,91 @@ List wald_covar(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec &gamma,
   ret["beta.lower"] = beta(indices) - R::qnorm5(1-alpha/2,0,1,true,false)*se_beta(indices);
   ret["beta.upper"] = beta(indices) + R::qnorm5(1-alpha/2,0,1,true,false)*se_beta(indices);
   return ret;
+}
+
+
+
+
+// [[Rcpp::export]]
+arma::vec Modified_score(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec gamma, arma::vec beta,
+                         double gamma_null, int m, arma::vec parm, int threads = 4) {
+
+
+  arma::vec gamma_obs = rep(gamma, n_prov);
+  arma::vec Z_beta = Z * beta; // commom term
+
+  arma::vec p = 1 / (1 + exp(-gamma_obs-Z_beta));  // p under full model
+  arma::vec pq = p % (1-p);  // pq under full model
+
+  arma::vec p_null = 1 / (1 + exp(-gamma_null-Z_beta)); // p under null model
+  arma::vec pq_null = p_null % (1-p_null);  // pq under null model
+  arma::vec Yp = Y - p_null;    //restricted (only new subvectors later)
+
+  arma::vec score_null(m), info_gamma_full_inv(m);  //U_0 under null model for each gamma
+  arma::mat info_betagamma_full(Z.n_cols,m);
+  arma::ivec indices(m + 1);  // Store indices of each ind location
+  int ind = 0;
+
+  for (int i = 0; i < m; i++) {
+    indices(i) = ind;  // Store the current start index
+    score_null(i) = sum(Yp.subvec(ind, ind + n_prov(i) - 1));
+    info_gamma_full_inv(i) = 1/sum(pq.subvec(ind, ind + n_prov(i) - 1));
+    info_betagamma_full.col(i) =
+      sum(Z.rows(ind,ind+n_prov(i)-1).each_col()%(p.subvec(ind,ind+n_prov(i)-1)%(1-p.subvec(ind,ind+n_prov(i)-1)))).t();
+    ind += n_prov(i);  // Update the index for the next iteration
+  }
+  indices(m) = ind;
+
+  // modify the information matrix under null model
+  // Initialize z_score vector with NaN
+  arma::vec z_score = arma::vec(m).fill(arma::datum::nan);
+
+  omp_set_num_threads(threads);
+  double temp_score, info_alpha, V0S;
+  arma::vec info_betaalpha, info_gamma_inv, pq_new;
+  arma::mat info_betagamma, info_beta, mat_tmp1, B11;
+
+
+  #pragma omp parallel for schedule(static) private(temp_score, info_alpha, info_betaalpha, info_gamma_inv, info_betagamma, info_beta, pq_new, mat_tmp1, B11, V0S)
+  for (int i = 0; i < m; i++) { //calculate each provider
+    // Only calculate if i is in parm
+    if(arma::any(parm == i)){
+      temp_score = score_null(i);
+      info_alpha = sum(pq_null.subvec(indices(i), indices(i + 1) - 1));
+      info_betaalpha = sum(Z.rows(indices(i), indices(i + 1) - 1).each_col()%(p_null.subvec(indices(i), indices(i + 1) - 1)%(1-p_null.subvec(indices(i), indices(i + 1) - 1)))).t();
+
+      if (i == 0) {
+        // If i is 0, skip the first element
+        info_gamma_inv = info_gamma_full_inv.subvec(1, m - 1);
+        info_betagamma = info_betagamma_full.cols(1, m - 1);
+      } else if (i == m - 1) {
+        // If i is the last element, take all elements up to the second to last
+        info_gamma_inv = info_gamma_full_inv.subvec(0, m - 2);
+        info_betagamma = info_betagamma_full.cols(0, m - 2);
+      } else {
+        // Otherwise, exclude the i-th element
+        info_gamma_inv = arma::join_cols(
+          info_gamma_full_inv.subvec(0, i - 1),
+          info_gamma_full_inv.subvec(i + 1, m - 1));
+        info_betagamma = arma::join_rows(
+          info_betagamma_full.cols(0, i - 1),
+          info_betagamma_full.cols(i + 1, m - 1));
+      }
+
+      //calculate I_beta under null model
+      pq_new = pq;
+      pq_new.subvec(indices(i), indices(i + 1) - 1) = pq_null.subvec(indices(i), indices(i + 1) - 1);
+      info_beta = Z.t() * (Z.each_col()%pq_new);
+
+      mat_tmp1 = info_betagamma.each_row() % info_gamma_inv.t();
+      B11 = inv_sympd(info_beta - mat_tmp1 * info_betagamma.t());
+
+      V0S = info_alpha - arma::as_scalar(info_betaalpha.t() * B11 * info_betaalpha);
+      z_score(i) = temp_score / sqrt(V0S);
+    }
+  };
+
+  // Remove NaN values (skipped) from z_score
+  z_score = z_score.elem(arma::find_finite(z_score));
+  return z_score;
 }

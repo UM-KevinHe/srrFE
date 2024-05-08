@@ -13,11 +13,14 @@
 #'   \item"exact.bootstrap": two-sided exact test based on bootstrap procedure
 #'   \item"wald": wald test
 #'   \item"score": score test
+#'   \item"modified.score": modified score test
 #'   }
 #'
 #' @param null a character string or real number specifying null hypotheses of fixed provider effects.
 #'
 #' @param n resample size for bootstrapping. Defaulting to 10,000.
+#'
+#' @param threads an integer specifying the number of threads to use. Defaulting to 4.
 #'
 #' @param ...
 #'
@@ -58,10 +61,10 @@
 #'
 #' @export
 
-test_fe <- function(fit, parm, level = 0.95, test = "exact.poisbinom", null = "median", n = 10000) {
+test_fe <- function(fit, parm, level = 0.95, test = "exact.poisbinom", null = "median", n = 10000, threads = 4) {
   if (missing(fit)) stop ("Argument 'fit is required!", call.=F)
   if (!class(fit) %in% c("logis_fe")) stop("Object fit is not of the classes 'logis_fe'!", call.=F)
-  if (!(test %in% c("exact.binom", "exact.poisbinom", "exact.bootstrap", "score", "wald")))
+  if (!(test %in% c("exact.binom", "exact.poisbinom", "exact.bootstrap", "score", "wald", "modified.score")))
     stop("Argument 'test' NOT as required!",call.=F)
   alpha <- 1 - level
 
@@ -76,14 +79,20 @@ test_fe <- function(fit, parm, level = 0.95, test = "exact.poisbinom", null = "m
                        ifelse(is.numeric(null), null[1],
                               stop("Argument 'null' NOT as required!",call.=F)))
   if (missing(parm)) {
-    # pass
-  } else if (class(parm)==class(data[,prov.char]) & test!="wald") {
-    data <- data[data[,prov.char] %in% parm,]
-  } else if (class(parm)==class(data[,prov.char]) & test=="wald") {
-    indices <- which(unique(data[,prov.char]) %in% parm)
+    # no operation needed, pass
   } else {
-    stop("Argument 'parm' includes invalid elements!")
+    if (is.numeric(parm)) {  #avoid "integer" class
+      parm <- as.numeric(parm)
+    }
+    if (class(parm) == class(data[, prov.char]) & !(test %in% c("wald", "modified.score"))) {
+      data <- data[data[, prov.char] %in% parm, ]
+    } else if (class(parm) == class(data[, prov.char]) & (test %in% c("wald", "modified.score"))) {
+      indices <- which(unique(data[, prov.char]) %in% parm)
+    } else {
+      stop("Argument 'parm' includes invalid elements!")
+    }
   }
+
 
   if (test=="exact.bootstrap") { #should consistent to exact.poisbinom method
     if (n<=0 | as.integer(n)!=n) stop("Argument 'n' NOT a positive integer!",call.=F)
@@ -114,6 +123,22 @@ test_fe <- function(fit, parm, level = 0.95, test = "exact.poisbinom", null = "m
                       p=p.val,
                       stat=z.score,
                       row.names=unique(data[, prov.char])))
+  } else if (test == "modified.score"){
+    n.prov <- sapply(split(data[, Y.char], data[, prov.char]), length)
+    m <- length(n.prov)
+    n.beta <- length(beta)
+    if (missing(parm)) {
+      indices <- 1:m
+    }
+    z.score <- Modified_score(data[,Y.char], as.matrix(data[,Z.char]), n.prov, gamma, beta,
+                              gamma.null, m, indices - 1, threads)  #In cpp, indices starts from 0
+    p <- pnorm(z.score, lower=F)
+    flag <- ifelse(p<alpha/2, 1, ifelse(p<=1-alpha/2, 0, -1))
+    p.val <- 2 * pmin(p, 1-p)
+    return(data.frame(flag=factor(flag),
+                      p=p.val,
+                      stat=z.score,
+                      row.names = unique(data[, prov.char])[indices]))
   } else if (test=="exact.poisbinom") {
     exact.poisbinom <- function(df) {
       probs <- plogis(gamma.null + unname(as.matrix(df[, Z.char])) %*% beta)

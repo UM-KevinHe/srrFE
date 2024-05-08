@@ -10,7 +10,8 @@ test_fe(
   level = 0.95,
   test = "exact.poisbinom",
   null = "median",
-  n = 10000
+  n = 10000,
+  threads = 4
 )
 }
 \arguments{
@@ -26,11 +27,14 @@ test_fe(
 \item"exact.bootstrap": two-sided exact test based on bootstrap procedure
 \item"wald": wald test
 \item"score": score test
+\item"modified.score": modified score test
 }}
 
 \item{null}{a character string or real number specifying null hypotheses of fixed provider effects.}
 
 \item{n}{resample size for bootstrapping. Defaulting to 10,000.}
+
+\item{threads}{an integer specifying the number of threads to use. Defaulting to 4.}
 
 \item{...}{}
 }

@@ -108,6 +108,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// Modified_score
+arma::vec Modified_score(arma::vec& Y, arma::mat& Z, arma::vec& n_prov, arma::vec gamma, arma::vec beta, double gamma_null, int m, arma::vec parm, int threads);
+RcppExport SEXP _srrFE_Modified_score(SEXP YSEXP, SEXP ZSEXP, SEXP n_provSEXP, SEXP gammaSEXP, SEXP betaSEXP, SEXP gamma_nullSEXP, SEXP mSEXP, SEXP parmSEXP, SEXP threadsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec& >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type Z(ZSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type n_prov(n_provSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type gamma(gammaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< double >::type gamma_null(gamma_nullSEXP);
+    Rcpp::traits::input_parameter< int >::type m(mSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type parm(parmSEXP);
+    Rcpp::traits::input_parameter< int >::type threads(threadsSEXP);
+    rcpp_result_gen = Rcpp::wrap(Modified_score(Y, Z, n_prov, gamma, beta, gamma_null, m, parm, threads));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_srrFE_computeDirectExp", (DL_FUNC) &_srrFE_computeDirectExp, 3},
@@ -115,6 +134,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_srrFE_logis_BIN_fe_prov", (DL_FUNC) &_srrFE_logis_BIN_fe_prov, 12},
     {"_srrFE_logis_firth_prov", (DL_FUNC) &_srrFE_logis_firth_prov, 14},
     {"_srrFE_wald_covar", (DL_FUNC) &_srrFE_wald_covar, 8},
+    {"_srrFE_Modified_score", (DL_FUNC) &_srrFE_Modified_score, 9},
     {NULL, NULL, 0}
 };
 

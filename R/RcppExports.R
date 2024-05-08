@@ -21,3 +21,7 @@ wald_covar <- function(Y, Z, n_prov, gamma, beta, indices, null, alpha) {
     .Call(`_srrFE_wald_covar`, Y, Z, n_prov, gamma, beta, indices, null, alpha)
 }
 
+Modified_score <- function(Y, Z, n_prov, gamma, beta, gamma_null, m, parm, threads = 4L) {
+    .Call(`_srrFE_Modified_score`, Y, Z, n_prov, gamma, beta, gamma_null, m, parm, threads)
+}
+
