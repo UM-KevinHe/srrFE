@@ -18,6 +18,8 @@
 #'
 #' @param null a character string or real number specifying null hypotheses of fixed provider effects.
 #'
+#' @param saddlepoint if test = "score", a logical indicating whether to use saddlepoint approximation for the score test. Defaulting to FALSE.
+#'
 #' @param n resample size for bootstrapping. Defaulting to 10,000.
 #'
 #' @param threads an integer specifying the number of threads to use. Defaulting to 4.
@@ -47,7 +49,7 @@
 #' data(data_FE)
 #' data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID, message = FALSE)
 #' fit_fe <- logis_fe(data.prep)
-#' test_fe(fit_fe)
+#' test_fe(fit_fe, test = "score", saddlepoint = T, parm = c(1, 3, 5, 6))
 #'
 #' @importFrom stats plogis qnorm pnorm rbinom
 #' @importFrom poibin ppoibin
@@ -61,7 +63,8 @@
 #'
 #' @export
 
-test_fe <- function(fit, parm, level = 0.95, test = "exact.poisbinom", null = "median", n = 10000, threads = 4) {
+test_fe <- function(fit, parm, level = 0.95, test = "exact.poisbinom", null = "median", saddlepoint = FALSE,
+                    n = 10000, threads = 4) {
   if (missing(fit)) stop ("Argument 'fit is required!", call.=F)
   if (!class(fit) %in% c("logis_fe")) stop("Object fit is not of the classes 'logis_fe'!", call.=F)
   if (!(test %in% c("exact.binom", "exact.poisbinom", "exact.bootstrap", "score", "wald", "modified.score")))
@@ -113,20 +116,33 @@ test_fe <- function(fit, parm, level = 0.95, test = "exact.poisbinom", null = "m
                       stat=results[3,],
                       row.names=unique(data[, prov.char])))
   } else if (test=="score") {
-    probs <- plogis(gamma.null+unname(as.matrix(data[,Z.char]))%*%beta)
-    z.score <- sapply(split(data[,Y.char]-probs,data[,prov.char]),sum) /
-      sqrt(sapply(split(probs*(1-probs),data[,prov.char]),sum))
-    p <- pnorm(z.score, lower=F)
-    flag <- ifelse(p<alpha/2, 1, ifelse(p<=1-alpha/2, 0, -1))
-    p.val <- 2 * pmin(p, 1-p)
-    return(data.frame(flag=factor(flag),
-                      p=p.val,
-                      stat=z.score,
-                      row.names=unique(data[, prov.char])))
+    if (saddlepoint == TRUE) {
+      n.prov <- sapply(split(data[, Y.char], data[, prov.char]), length)
+      m <- length(n.prov)
+      z.score <- saddlepoint_score(data[,Y.char], as.matrix(data[,Z.char]), n.prov, beta,
+                                   gamma.null, m, threads, 1e-6)
+      p <- pnorm(z.score, lower=F)
+      flag <- ifelse(p<alpha/2, 1, ifelse(p<=1-alpha/2, 0, -1))
+      p.val <- 2 * pmin(p, 1-p)
+      return(data.frame(flag=factor(flag),
+                        p=p.val,
+                        stat=z.score,
+                        row.names=unique(data[, prov.char])))
+    } else {
+      probs <- plogis(gamma.null+unname(as.matrix(data[,Z.char]))%*%beta)
+      z.score <- sapply(split(data[,Y.char]-probs,data[,prov.char]),sum) /
+        sqrt(sapply(split(probs*(1-probs),data[,prov.char]),sum))
+      p <- pnorm(z.score, lower=F)
+      flag <- ifelse(p<alpha/2, 1, ifelse(p<=1-alpha/2, 0, -1))
+      p.val <- 2 * pmin(p, 1-p)
+      return(data.frame(flag=factor(flag),
+                        p=p.val,
+                        stat=z.score,
+                        row.names=unique(data[, prov.char])))
+    }
   } else if (test == "modified.score"){
     n.prov <- sapply(split(data[, Y.char], data[, prov.char]), length)
     m <- length(n.prov)
-    n.beta <- length(beta)
     if (missing(parm)) {
       indices <- 1:m
     }

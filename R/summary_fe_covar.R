@@ -26,7 +26,7 @@
 #' data(data_FE)
 #' data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID, message = FALSE)
 #' fit_fe <- logis_fe(data.prep)
-#' summary.wald.cpp <- summary_fe_covar(fit_fe, level = 0.05, test = "wald")
+#' summary.wald.cpp <- summary_fe_covar(fit_fe, level = 0.95, test = "wald")
 #' summary.wald.cpp
 #'
 #' @importFrom Rcpp evalCpp

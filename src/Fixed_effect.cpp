@@ -6,6 +6,7 @@
 // [[Rcpp::depends(RcppArmadillo)]]
 #include <cmath>
 #include <omp.h>
+#include <iostream>
 
 // [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::plugins(openmp)]]
@@ -533,5 +534,77 @@ arma::vec Modified_score(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::ve
 
   // Remove NaN values (skipped) from z_score
   z_score = z_score.elem(arma::find_finite(z_score));
+  return z_score;
+}
+
+
+
+double K(const arma::vec &p, double t, double sum_pi) {
+  return arma::sum(arma::log(p * exp(t) + (1 - p))) - t * sum_pi;
+}
+
+double K1(const arma::vec &p, double t, double sum_pi) {
+  return arma::sum(p / ((1 - p) * exp(-t) + p)) - sum_pi;
+}
+
+double K2(const arma::vec &p, double t) {
+  double temp = exp(-t); // Compute exp(-t), which is a scalar
+  arma::vec denominator = (1 - p) * temp + p; // Multiply each element of (1 - p) by scalar temp and add p
+  arma::vec numerator = p % (1 - p) * temp; // Element-wise multiplication of p and (1 - p) then scalar multiplication by temp
+
+  return arma::sum(numerator / arma::square(denominator)); // Element-wise division and squaring the denominator
+}
+
+
+// Bisection method to find the root of k1(i) - si
+double find_root(const arma::vec& p, double sum_pi, double si, double t_low, double t_high, double tol = 1e-6) {
+  double t_mid, k1_mid;
+  while (t_high - t_low > tol) {
+    t_mid = (t_low + t_high) / 2.0;
+    k1_mid = K1(p, t_mid, sum_pi);
+    if (k1_mid < si) {
+      t_low = t_mid;
+    } else {
+      t_high = t_mid;
+    }
+  }
+  return (t_low + t_high) / 2.0;
+}
+
+
+// [[Rcpp::export]]
+arma::vec saddlepoint_score(arma::vec &Y, arma::mat &Z, arma::vec &n_prov,
+                            arma::vec beta, double gamma_null,
+                            int m, int threads=4, double root_tol=1e-6) {
+  arma::vec Z_beta = Z * beta; // commom term
+  arma::vec p_null = 1 / (1 + exp(-gamma_null-Z_beta)); // p under null model
+  arma::vec Yp = Y - p_null;    //restricted (only new subvectors later)
+
+  double score_i, t_hat_i, w, v;
+  double k, k2; //define CGF and its derivatives
+  int ind = 0;
+
+  arma::ivec indices(m + 1);  // Store indices of each ind location
+  for (int i = 0; i < m; i++) {
+    indices(i) = ind;
+    ind += n_prov(i);
+  }
+  indices(m) = ind;
+
+  omp_set_num_threads(threads);
+  arma::vec z_score = arma::vec(m).fill(arma::datum::nan);
+
+#pragma omp parallel for private(score_i, t_hat_i, w, v, k, k2, ind)
+  for (int i = 0; i < m; i++) {
+    score_i = sum(Yp.subvec(indices(i), indices(i + 1) - 1)); //tested score
+    arma::vec p_i = p_null.subvec(indices(i), indices(i + 1) - 1);
+    double sum_pi = sum(p_i);
+    t_hat_i = find_root(p_i, sum_pi, score_i, -10, 10, root_tol);
+    k = K(p_i, t_hat_i, sum_pi);
+    k2 = K2(p_i, t_hat_i);
+    w = std::copysign(1.0, t_hat_i) * std::sqrt(2 * (t_hat_i * score_i - k));
+    v = t_hat_i * std::sqrt(k2);
+    z_score(i) = w + (1.0 / w) * std::log(v / w);
+  }
   return z_score;
 }

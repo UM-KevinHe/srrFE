@@ -25,3 +25,7 @@ Modified_score <- function(Y, Z, n_prov, gamma, beta, gamma_null, m, parm, threa
     .Call(`_srrFE_Modified_score`, Y, Z, n_prov, gamma, beta, gamma_null, m, parm, threads)
 }
 
+saddlepoint_score <- function(Y, Z, n_prov, beta, gamma_null, m, threads = 4L, root_tol = 1e-6) {
+    .Call(`_srrFE_saddlepoint_score`, Y, Z, n_prov, beta, gamma_null, m, threads, root_tol)
+}
+

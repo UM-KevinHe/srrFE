@@ -10,6 +10,7 @@ test_fe(
   level = 0.95,
   test = "exact.poisbinom",
   null = "median",
+  saddlepoint = FALSE,
   n = 10000,
   threads = 4
 )
@@ -31,6 +32,8 @@ test_fe(
 }}
 
 \item{null}{a character string or real number specifying null hypotheses of fixed provider effects.}
+
+\item{saddlepoint}{if test = "score", a logical indicating whether to use saddlepoint approximation for the score test. Defaulting to FALSE.}
 
 \item{n}{resample size for bootstrapping. Defaulting to 10,000.}
 
@@ -59,7 +62,7 @@ The wald test is invalid for extreme providers (i.e. when provider effect goes t
 data(data_FE)
 data.prep <- fe_data_prep(data_FE$Y, data_FE$Z, data_FE$ID, message = FALSE)
 fit_fe <- logis_fe(data.prep)
-test_fe(fit_fe)
+test_fe(fit_fe, test = "score", saddlepoint = T, parm = c(1, 3, 5, 6))
 
 }
 \references{
