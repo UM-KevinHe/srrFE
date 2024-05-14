@@ -50,7 +50,9 @@
 #'
 #' \item{gamma}{a vector of estimates of provider effects}
 #'
-#' \item{obs}{a vector of patients-level outcome}
+#' \item{linear_pred}{a vector of linear predictors}
+#'
+#' \item{pred}{a vector of predicted probabilities}
 #'
 #' \item{neg2Loglkd}{minus two times log likelihood}
 #'
@@ -97,6 +99,8 @@ logis_fe <- function(data.prep, algorithm = "SerBIN", max.iter = 10000, tol = 1e
   prov.char <- data.prep$char_list$prov.char
   Z.char <- data.prep$char_list$Z.char
 
+
+  # for the remaining parts, only use the data with "included==1" ("cutoff" of provider size)
   data <- data[data$included==1,]
   n.prov <- sapply(split(data[, Y.char], data[, prov.char]), length) # provider-specific number of discharges
   n.events.prov <- sapply(split(data[, Y.char], data[, prov.char]), sum) # provider-specific number of events
@@ -248,13 +252,8 @@ logis_fe <- function(data.prep, algorithm = "SerBIN", max.iter = 10000, tol = 1e
 
   df.prov <- data.frame(Obs_provider = sapply(split(data[,Y.char],data[,prov.char]),sum),
                         gamma_est = gamma.prov) #original gamma-hat, for internal using
-  pred <- as.numeric(plogis(gamma.obs+Z%*%beta))
-
-  # modify "outlier provider" to Inf or -Inf
-  # if (sum(n.events.prov==n.prov) != 0 | sum(n.events.prov==0) != 0) {
-  #   gamma.prov[n.events.prov==n.prov] <- Inf
-  #   gamma.prov[n.events.prov==0] <- -Inf
-  # }
+  linear_pred <- Z %*% beta
+  pred <- as.numeric(plogis(gamma.obs + linear_pred))
 
   #change output format
   beta <- matrix(beta)
@@ -266,11 +265,13 @@ logis_fe <- function(data.prep, algorithm = "SerBIN", max.iter = 10000, tol = 1e
 
   return_ls <- structure(list(beta = beta,
                               gamma = gamma.prov, #provider effect
+                              linear_pred = linear_pred, #linear predictor
                               pred = pred, #predicted probability
-                              obs = data[, Y.char], #patient-level obs
                               neg2Loglkd = neg2Loglkd,
                               AIC = AIC,
-                              BIC = BIC),
+                              BIC = BIC,
+                              obs = data[, Y.char], #patient-level obs
+                              prov = data[, prov.char]),
                          class = "logis_fe")
   if (AUC) {
     AUC <- pROC::auc(data[,Y.char], pred)

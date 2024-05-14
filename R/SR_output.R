@@ -19,7 +19,7 @@
 #'
 #' @param Rcpp a boolean indicating whether to use Rcpp. Defaulting to TRUE.
 #'
-#' @param threads an integer specifying the number of threads to use. Defaulting to 4.
+#' @param threads an integer specifying the number of threads to use. Defaulting to 2.
 #'
 #' @param ...
 #'
@@ -59,7 +59,7 @@
 
 
 SR_output <- function(fit, stdz = "indirect", measure = c("rate", "ratio"), null = "median",
-                      Rcpp = TRUE, threads = 4, ...){
+                      Rcpp = TRUE, threads = 2, ...){
   if (missing(fit)) stop ("Argument 'fit' is required!", call.=F)
   if (!class(fit) %in% c("logis_fe")) stop("Object fit is not of the classes 'logis_fe'!", call.=F)
 
@@ -69,104 +69,66 @@ SR_output <- function(fit, stdz = "indirect", measure = c("rate", "ratio"), null
   if (!"rate" %in% measure & !"ratio" %in% measure){
     stop("Argument 'measure' NOT as required!",call.=F)
   }
-  Y.char <- fit$char_list$Y.char
-  Z.char <- fit$char_list$Z.char
-  prov.char <- fit$char_list$prov.char
-  data <- fit$data_include
 
-  n.prov <- sapply(split(data[, Y.char], data[, prov.char]), length) # provider-specific number of discharges
-  n.events.prov <- sapply(split(data[, Y.char], data[, prov.char]), sum) # provider-specific number of events
-  Z <- as.matrix(data[,Z.char])
   gamma.prov <- fit$gamma
-  beta <- fit$beta
-  gamma.obs <- rep(gamma.prov, n.prov)
-  population_rate <- sum(data[,Y.char])/length(gamma.obs) * 100  #sum(O_i)/N *100%
+  Z_beta <- fit$linear_pred
+
+
+  return_ls <- list()
+  OE_list <- list()
 
   if ("indirect" %in% stdz) {
     gamma.null <- ifelse(null=="median", median(gamma.prov),
                          ifelse(class(null)=="numeric", null[1],
                                 stop("Argument 'null' NOT as required!",call.=F)))
-    Exp <- as.numeric(plogis(gamma.null+Z%*%beta)) # expected prob of events under null
+    Exp <- as.numeric(plogis(gamma.null + Z_beta)) # expected prob of events under null
 
-    df.prov <- data.frame(Obs_provider = sapply(split(data[,Y.char],data[,prov.char]),sum),
-                          Exp.indirect_provider = sapply(split(Exp,data[,prov.char]),sum))
-    OE_indirect <- df.prov
-
+    df.prov <- data.frame(Obs_provider = fit$df.prov$Obs_provider,
+                          Exp.indirect_provider = sapply(split(Exp, fit$prov), sum))
+    OE_list$OE_indirect <- df.prov
     df.prov$IS_Ratio <- df.prov$Obs_provider / df.prov$Exp.indirect_provider #indirect standardized ratio: O_i/E_i
-    df.prov$IS_Rate <- pmax(pmin(df.prov$IS_Ratio * population_rate, 100), 0)  #restricted to 0%-100%
-
-    indirect_stdz.ratio <- matrix(df.prov$IS_Ratio) #output measure
-    dimnames(indirect_stdz.ratio) <- list(names(n.prov), "Indirect_standardized.ratio")
-    indirect_stdz.rate <- matrix(df.prov$IS_Rate)
-    dimnames(indirect_stdz.rate) <- list(names(n.prov), "Indirect_standardized.rate")
+    if ("ratio" %in% measure){
+      indirect_stdz.ratio <- matrix(df.prov$IS_Ratio)
+      dimnames(indirect_stdz.ratio) <- list(rownames(fit$gamma), "Indirect_standardized.ratio")
+      return_ls$indirect.ratio <- indirect_stdz.ratio
+    }
+    if ("rate" %in% measure) {
+      population_rate <- sum(fit$obs)/length(Z_beta) * 100  #sum(O_i)/N *100%
+      df.prov$IS_Rate <- pmax(pmin(df.prov$IS_Ratio * population_rate, 100), 0)  #restricted to 0%-100%
+      indirect_stdz.rate <- matrix(df.prov$IS_Rate)
+      dimnames(indirect_stdz.rate) <- list(rownames(fit$gamma), "Indirect_standardized.rate")
+      return_ls$indirect.rate <- indirect_stdz.rate
+    }
   }
 
   if ("direct" %in% stdz) {
-    Z_beta <- Z %*% beta
     if (Rcpp) {
-      # t1 <- Sys.time()
       Exp <- computeDirectExp(gamma.prov, Z_beta, threads)
-      # time1 <- Sys.time() - t1
     } else {
-      # t2 <- Sys.time()
       exp_ZB <- exp(Z_beta)
       Exp.direct <- function(gamma){
         numer <- exp(gamma) * exp_ZB
         sum(1/(1 + 1/numer))
       }
       Exp <- sapply(gamma.prov, Exp.direct)
-      # time2 <- Sys.time() - t2
     }
 
-
-    df.prov <- data.frame(Obs_all = rep(sum(data[,Y.char]), length(gamma.prov)), #denominator
+    df.prov <- data.frame(Obs_all = rep(sum(fit$obs), length(gamma.prov)), #denominator
                           Exp.direct_all = Exp)  #numerator
-    OE_direct <- df.prov
+    OE_list$OE_direct <- df.prov
     df.prov$DS_ratio <- df.prov$Exp.direct_all / df.prov$Obs_all #direct standardized ratio: E/sum(O)
-    df.prov$DS_Rate <- pmax(pmin(df.prov$DS_ratio * population_rate, 100), 0)  #restricted to 0%-100%
-
-    direct_stdz.ratio <- matrix(df.prov$DS_ratio)
-    dimnames(direct_stdz.ratio) <- list(names(n.prov), "Direct_standardized.ratio")
-    direct_stdz.rate <- matrix(df.prov$DS_Rate)
-    dimnames(direct_stdz.rate) <- list(names(n.prov), "Direct_standardized.rate")
-  }
-
-
-  # # modify "outlier provider"
-  # if (sum(n.events.prov==n.prov) != 0 | sum(n.events.prov==0) != 0) {
-  #   if ("direct" %in% stdz) { #only "direct standardized rates/ratios" are affected
-  #     if ("ratio" %in% measure){
-  #       direct_stdz.ratio[n.events.prov==n.prov,] <- length(gamma.obs) / df.prov$Obs_all[1]
-  #       direct_stdz.ratio[n.events.prov==0,] <- 0
-  #     }
-  #     if ("rate" %in% measure){
-  #       direct_stdz.rate[n.events.prov==n.prov,] <- 1
-  #       direct_stdz.rate[n.events.prov==0,] <- 0
-  #     }
-  #   }
-  # }
-
-  return_ls <- list()
-  OE_list <- list()
-
-  if ("indirect" %in% stdz){
     if ("ratio" %in% measure){
-      return_ls$indirect.ratio <- indirect_stdz.ratio
-    }
-    if ("rate" %in% measure) {
-      return_ls$indirect.rate <- indirect_stdz.rate
-    }
-    OE_list$OE_indirect <- OE_indirect
-  }
-
-  if ("direct" %in% stdz) {
-    if ("ratio" %in% measure){
+      direct_stdz.ratio <- matrix(df.prov$DS_ratio)
+      dimnames(direct_stdz.ratio) <- list(rownames(fit$gamma), "Direct_standardized.ratio")
       return_ls$direct.ratio <- direct_stdz.ratio
     }
     if ("rate" %in% measure) {
+      population_rate <- sum(fit$obs)/length(Z_beta) * 100  #sum(O_i)/N *100%
+      df.prov$DS_Rate <- pmax(pmin(df.prov$DS_ratio * population_rate, 100), 0)  #restricted to 0%-100%
+      direct_stdz.rate <- matrix(df.prov$DS_Rate)
+      dimnames(direct_stdz.rate) <- list(rownames(fit$gamma), "Direct_standardized.rate")
       return_ls$direct.rate <- direct_stdz.rate
     }
-    OE_list$OE_direct <- OE_direct
   }
   return_ls$OE <- OE_list
   return(return_ls)

@@ -48,7 +48,9 @@ An object with S3 class \code{logis_fe}.
 
 \item{gamma}{a vector of estimates of provider effects}
 
-\item{obs}{a vector of patients-level outcome}
+\item{linear_pred}{a vector of linear predictors}
+
+\item{pred}{a vector of predicted probabilities}
 
 \item{neg2Loglkd}{minus two times log likelihood}
 

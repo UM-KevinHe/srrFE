@@ -12,7 +12,8 @@ test_fe(
   null = "median",
   saddlepoint = FALSE,
   n = 10000,
-  threads = 4
+  threads = 2,
+  ...
 )
 }
 \arguments{
@@ -37,7 +38,7 @@ test_fe(
 
 \item{n}{resample size for bootstrapping. Defaulting to 10,000.}
 
-\item{threads}{an integer specifying the number of threads to use. Defaulting to 4.}
+\item{threads}{an integer specifying the number of threads to use. Defaulting to 2.}
 
 \item{...}{}
 }

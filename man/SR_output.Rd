@@ -10,7 +10,7 @@ SR_output(
   measure = c("rate", "ratio"),
   null = "median",
   Rcpp = TRUE,
-  threads = 4,
+  threads = 2,
   ...
 )
 }
@@ -33,7 +33,7 @@ SR_output(
 
 \item{Rcpp}{a boolean indicating whether to use Rcpp. Defaulting to TRUE.}
 
-\item{threads}{an integer specifying the number of threads to use. Defaulting to 4.}
+\item{threads}{an integer specifying the number of threads to use. Defaulting to 2.}
 
 \item{...}{}
 }

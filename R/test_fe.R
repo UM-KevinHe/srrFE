@@ -22,7 +22,7 @@
 #'
 #' @param n resample size for bootstrapping. Defaulting to 10,000.
 #'
-#' @param threads an integer specifying the number of threads to use. Defaulting to 4.
+#' @param threads an integer specifying the number of threads to use. Defaulting to 2.
 #'
 #' @param ...
 #'
@@ -64,7 +64,7 @@
 #' @export
 
 test_fe <- function(fit, parm, level = 0.95, test = "exact.poisbinom", null = "median", saddlepoint = FALSE,
-                    n = 10000, threads = 4) {
+                    n = 10000, threads = 2, ...) {
   if (missing(fit)) stop ("Argument 'fit is required!", call.=F)
   if (!class(fit) %in% c("logis_fe")) stop("Object fit is not of the classes 'logis_fe'!", call.=F)
   if (!(test %in% c("exact.binom", "exact.poisbinom", "exact.bootstrap", "score", "wald", "modified.score")))
