@@ -19,7 +19,7 @@
 #'
 #' @param Rcpp a boolean indicating whether to use Rcpp. Defaulting to TRUE.
 #'
-#' @param threads an integer specifying the number of threads to use. Defaulting to 2.
+#' @param threads an integer specifying the number of threads to use if "Rcpp = T". Defaulting to 1.
 #'
 #' @param ...
 #'
@@ -59,7 +59,7 @@
 
 
 SR_output <- function(fit, stdz = "indirect", measure = c("rate", "ratio"), null = "median",
-                      Rcpp = TRUE, threads = 2, ...){
+                      Rcpp = TRUE, threads = 1, ...){
   if (missing(fit)) stop ("Argument 'fit' is required!", call.=F)
   if (!class(fit) %in% c("logis_fe")) stop("Object fit is not of the classes 'logis_fe'!", call.=F)
 
