@@ -11,6 +11,7 @@ logis_firth(
   bound = 10,
   backtrack = TRUE,
   Rcpp = TRUE,
+  threads = 1,
   AUC = FALSE,
   message = FALSE
 )
@@ -27,6 +28,8 @@ logis_firth(
 \item{backtrack}{a boolean indicating whether backtracking line search is implemented. Defaulting to FALSE.}
 
 \item{Rcpp}{a Boolean indicating whether the Rcpp function is used. Defaulting to TRUE.}
+
+\item{threads}{an integer indicating the number of threads to use if "Rcpp = T". Defaulting to 1.}
 
 \item{AUC}{a Boolean indicating whether report AUC. Defaulting to FALSE.}
 

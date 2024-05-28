@@ -39,7 +39,7 @@ Major steps in this stage include (in order):
 }
 
 The \code{fe_data_prep()} function returns data sorted by the provider identifiers,
-accompanied by additional provider-related information indicating whether the provider's size exceeds a specified "cutoff"
+accompanied by additional provider-related information indicating whether the provider's size is smaller than a specified "cutoff"
 and whether the respective provider has experienced either zero or all events.
 The reason behind introducing a "cutoff" lies in findings from both simulated and real data studies,
 revealing the instability of coefficient estimates for providers with small sizes.

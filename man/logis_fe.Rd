@@ -12,6 +12,7 @@ logis_fe(
   bound = 10,
   backtrack = TRUE,
   Rcpp = TRUE,
+  threads = 1,
   AUC = FALSE,
   message = FALSE
 )
@@ -33,7 +34,9 @@ logis_fe(
 
 \item{backtrack}{a boolean indicating whether backtracking line search is implemented. Defaulting to FALSE.}
 
-\item{Rcpp}{a Boolean indicating whether the Rcpp function is used. Defaulting to TRUE.}
+\item{Rcpp}{a Boolean indicating whether the Rcpp function is used if "Rcpp = T". Defaulting to TRUE.}
+
+\item{threads}{a positive integer specifying the number of threads to be used. Defaulting to 1.}
 
 \item{AUC}{a Boolean indicating whether report AUC. Defaulting to FALSE.}
 

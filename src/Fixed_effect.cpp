@@ -98,6 +98,10 @@ double Exp_direct(double gamma, const arma::vec& Z_beta) {
     return sum;
 }
 
+double p_binomial(double &eta) {
+  return(1/(1+exp(-eta)));
+}
+
 
 // [[Rcpp::export]]
 arma::vec computeDirectExp(const arma::vec& gamma_prov, const arma::vec& Z_beta, const int &threads) {
@@ -137,6 +141,9 @@ List logis_fe_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec gamm
       arma::vec Z_beta = Z * beta;
       arma::vec p = 1 / (1 + exp(-gamma_obs-Z_beta));
       arma::vec Yp = Y - p, pq = p % (1-p);
+      if (any(pq == 0)) {
+        pq.replace(0, 1e-20);
+      }
       arma::vec score_gamma(m), d_gamma(m);
       ind = 0;
       for (int i = 0; i < m; i++) {
@@ -197,6 +204,9 @@ List logis_fe_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec gamm
       arma::vec Z_beta = Z * beta;
       arma::vec p = 1 / (1 + exp(-gamma_obs-Z_beta));
       arma::vec Yp = Y - p, pq = p % (1-p);
+      if (any(pq == 0)) {
+        pq.replace(0, 1e-20);
+      }
       ind = 0;
       for (int i = 0; i < m; i++) {
         gamma(i) += sum(Yp(span(ind,ind+n_prov(i)-1))) /
@@ -208,7 +218,7 @@ List logis_fe_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec gamm
       // regression parameter update
       p = 1/(1+exp(-gamma_obs-Z_beta)); // update p
       pq = p % (1-p);
-      arma::vec score_beta = Z.t() * Yp;
+      arma::vec score_beta = Z.t() * (Y - p);
       // info_beta = info_beta_tbb(Z, pq); // tbb
       arma::mat info_beta = Z.t() * (Z.each_col()%pq); // serial
       arma::vec d_beta = solve(info_beta, score_beta, solve_opts::fast+solve_opts::likely_sympd);
@@ -229,7 +239,7 @@ List logis_fe_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec gamm
 
 // [[Rcpp::export]]
 List logis_BIN_fe_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec gamma, arma::vec beta,
-                       int parallel=1, int threads=1, double tol=1e-8, int max_iter=10000,
+                       int threads=1, double tol=1e-8, int max_iter=10000,
                        double bound=10.0, bool message = true, bool backtrack = false) {
 
   int iter = 0, n = Z.n_rows, m = n_prov.n_elem, ind;
@@ -253,22 +263,24 @@ List logis_BIN_fe_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec 
     arma::vec Z_beta = Z * beta;
     arma::vec p = 1 / (1 + exp(-gamma_obs-Z_beta));
     arma::vec Yp = Y - p, pq = p % (1-p);
+    if (any(pq == 0)) {
+      pq.replace(0, 1e-20);
+    }
     arma::vec score_gamma(m), info_gamma_inv(m);
     arma::mat info_betagamma(Z.n_cols,m);
     ind = 0;
     for (int i = 0; i < m; i++) {
       score_gamma(i) = sum(Yp(span(ind,ind+n_prov(i)-1)));
       info_gamma_inv(i) = 1 / sum(pq(span(ind,ind+n_prov(i)-1)));
-      info_betagamma.col(i) =
-        sum(Z.rows(ind,ind+n_prov(i)-1).each_col()%(p.subvec(ind,ind+n_prov(i)-1)%(1-p.subvec(ind,ind+n_prov(i)-1)))).t();
+      info_betagamma.col(i) = sum(Z.rows(ind,ind+n_prov(i)-1).each_col() % pq.subvec(ind,ind+n_prov(i)-1)).t();
       ind += n_prov(i);
     }
     arma::vec score_beta = Z.t() * Yp;
     arma::mat info_beta(Z.n_cols, Z.n_cols);
-    if (parallel==1) { // parallel
+    if (threads > 1) { // parallel
       info_beta = info_beta_omp(Z, pq, threads); // omp
       // info_beta = info_beta_tbb(Z, pq); // tbb
-    } else if (parallel==0) { // serial
+    } else if (threads == 1) { // serial
       info_beta = Z.t() * (Z.each_col()%pq);
     }
     arma::mat mat_tmp1 = trans(info_betagamma.each_row()%info_gamma_inv.t());
@@ -277,14 +289,14 @@ List logis_BIN_fe_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec 
     arma::vec d_gamma = info_gamma_inv%score_gamma + mat_tmp2*(mat_tmp1.t()*score_gamma-score_beta);
     arma::vec d_beta = schur_inv*score_beta - mat_tmp2.t()*score_gamma;
 
-
     v = 1.0; // initialize step size
     if (backtrack == true){
-      loglkd = Loglkd(Y, Z * beta, rep(gamma, n_prov));
+      loglkd = Loglkd(Y, Z_beta, gamma_obs);
       gamma_tmp = gamma + v * d_gamma;
       gamma_obs_tmp = rep(gamma_tmp, n_prov);
       arma::vec Z_beta_tmp = Z * (beta+v*d_beta);
       lambda = dot(score_gamma, d_gamma) + dot(score_beta, d_beta);
+      d_loglkd = Loglkd(Y, Z_beta_tmp, gamma_obs_tmp) - loglkd;
       while (d_loglkd < s*v*lambda) {
         v = t*v;
         gamma_tmp = gamma + v * d_gamma;
@@ -311,11 +323,11 @@ List logis_BIN_fe_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec 
 
 
 // [[Rcpp::export]]
-List logis_firth_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec gamma, arma::vec beta, int n_obs,
-                      int m, int parallel=1, int threads=1, double tol=1e-8, int max_iter=10000,
+List logis_firth_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec gamma, arma::vec beta,
+                      int n_obs, int m, int threads=1, double tol=1e-8, int max_iter=10000,
                       double bound=10.0, bool message = true, bool backtrack = false) {
 
-  int iter = 0, n = n_obs, ind;
+  int iter = 0, n = n_obs, ind = 0;
   double v;
   arma::vec gamma_obs(n);
   double crit = 100.0;
@@ -326,6 +338,12 @@ List logis_firth_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec g
   double s = 0.01, t = 0.6; //only used for "backtrack = true"
   double lambda, d_loglkd, loglkd;
   arma::vec gamma_obs_tmp(n), gamma_tmp(m), beta_tmp(Z.n_cols);
+  arma::ivec indices(m + 1);  // Store indices of each ind location
+  for (int i = 0; i < m; i++) {
+    indices(i) = ind;  // Store the current start index
+    ind += n_prov(i); // Update the index for the next iteration
+  }
+  indices(m) = ind;
 
   while (iter < max_iter) {
     if (crit < tol) {
@@ -336,21 +354,22 @@ List logis_firth_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec g
     arma::vec Z_beta = Z * beta;
     arma::vec p = 1 / (1 + exp(-gamma_obs-Z_beta));
     arma::vec Yp = Y - p, pq = p % (1-p);
+    if (any(pq == 0)) {
+      pq.replace(0, 1e-20);
+    }
     arma::vec score_gamma(m), info_gamma_inv(m);
     arma::mat info_betagamma(Z.n_cols,m);
 
-    ind = 0;
     for (int i = 0; i < m; i++) {
-      info_gamma_inv(i) = 1 / sum(pq(span(ind,ind+n_prov(i)-1)));
-      info_betagamma.col(i) =
-        sum(Z.rows(ind,ind+n_prov(i)-1).each_col()%(p.subvec(ind,ind+n_prov(i)-1)%(1-p.subvec(ind,ind+n_prov(i)-1)))).t();
-      ind += n_prov(i);
+      info_gamma_inv(i) = 1 / sum(pq.subvec(indices(i), indices(i + 1) - 1));
+      info_betagamma.col(i) = sum(Z.rows(indices(i), indices(i + 1) - 1).each_col() % pq.subvec(indices(i), indices(i + 1) - 1)).t();
     }
+
     arma::mat info_beta(Z.n_cols, Z.n_cols);
-    if (parallel==1) { // parallel
+    if (threads > 1) { // parallel
       info_beta = info_beta_omp(Z, pq, threads); // omp
       // info_beta = info_beta_tbb(Z, pq); // tbb
-    } else if (parallel==0) { // serial
+    } else if (threads == 1) { // serial
       info_beta = Z.t() * (Z.each_col()%pq);
     }
 
@@ -362,14 +381,15 @@ List logis_firth_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec g
     arma::vec diag_prod = info_gamma_inv + prod.diag();
     arma::vec c1 = rep(diag_prod, n_prov);
 
-    arma::vec c2(n);
-    ind = 0;
+
+    arma::vec c2(n), c3(n);
+    omp_set_num_threads(threads);
+    #pragma omp parallel for schedule(static)
     for (int i = 0; i < m; i++) {
-      c2.subvec(ind,ind+n_prov(i)-1) = - Z.rows(ind,ind+n_prov(i)-1) * mat_tmp2.t().eval().col(i);
-      ind += n_prov(i);
+      c2.subvec(indices(i), indices(i + 1) - 1) = - Z.rows(indices(i), indices(i + 1) - 1) * mat_tmp2.t().eval().col(i);
     }
 
-    arma::vec c3(n);
+    #pragma omp parallel for schedule(static)
     for (int i = 0; i < n; i++) {
       double a = (Z.row(i) * schur_inv * Z.row(i).t()).eval()(0,0);
       c3(i) = a;
@@ -377,17 +397,15 @@ List logis_firth_prov(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::vec g
 
     arma::vec YpA = Yp + pq % (c1 + c2 + c2 + c3) % (0.5 - p);
     arma::vec score_beta = Z.t() * YpA;
-    ind = 0;
     for (int i = 0; i < m; i++) {
-      score_gamma(i) = sum(YpA(span(ind,ind+n_prov(i)-1)));
-      ind += n_prov(i);
+      score_gamma(i) = sum(YpA.subvec(indices(i), indices(i + 1) - 1));
     }
 
     arma::vec d_gamma = info_gamma_inv%score_gamma + mat_tmp2*(mat_tmp1.t()*score_gamma-score_beta);
     arma::vec d_beta = schur_inv*score_beta - mat_tmp2.t()*score_gamma;
     v = 1.0; // initialize step size
     if (backtrack == true){
-      loglkd = Loglkd(Y, Z * beta, rep(gamma, n_prov));
+      loglkd = Loglkd(Y, Z_beta, gamma_obs);
       gamma_tmp = gamma + v * d_gamma;
       gamma_obs_tmp = rep(gamma_tmp, n_prov);
       arma::vec Z_beta_tmp = Z * (beta+v*d_beta);
@@ -463,9 +481,15 @@ arma::vec Modified_score(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::ve
 
   arma::vec p = 1 / (1 + exp(-gamma_obs-Z_beta));  // p under full model
   arma::vec pq = p % (1-p);  // pq under full model
+  if (any(pq == 0)) {
+    pq.replace(0, 1e-20);
+  }
 
   arma::vec p_null = 1 / (1 + exp(-gamma_null-Z_beta)); // p under null model
   arma::vec pq_null = p_null % (1-p_null);  // pq under null model
+  if (any(pq_null == 0)) {
+    pq_null.replace(0, 1e-20);
+  }
   arma::vec Yp = Y - p_null;    //restricted (only new subvectors later)
 
   arma::vec score_null(m), info_gamma_full_inv(m);  //U_0 under null model for each gamma
@@ -491,7 +515,6 @@ arma::vec Modified_score(arma::vec &Y, arma::mat &Z, arma::vec &n_prov, arma::ve
   double temp_score, info_alpha, V0S;
   arma::vec info_betaalpha, info_gamma_inv, pq_new;
   arma::mat info_betagamma, info_beta, mat_tmp1, B11;
-
 
   #pragma omp parallel for schedule(static) private(temp_score, info_alpha, info_betaalpha, info_gamma_inv, info_betagamma, info_beta, pq_new, mat_tmp1, B11, V0S)
   for (int i = 0; i < m; i++) { //calculate each provider

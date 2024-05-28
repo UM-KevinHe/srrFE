@@ -26,7 +26,7 @@
 #'   }
 #'
 #' The `fe_data_prep()` function returns data sorted by the provider identifiers,
-#' accompanied by additional provider-related information indicating whether the provider's size exceeds a specified "cutoff"
+#' accompanied by additional provider-related information indicating whether the provider's size is smaller than a specified "cutoff"
 #' and whether the respective provider has experienced either zero or all events.
 #' The reason behind introducing a "cutoff" lies in findings from both simulated and real data studies,
 #' revealing the instability of coefficient estimates for providers with small sizes.
@@ -123,8 +123,8 @@ fe_data_prep <- function(Y, Z, ID, cutoff = 10, check = TRUE, message = TRUE) {
   data <- data[order(factor(data[,prov.char])),] # sort data by provider ID
   prov.size <- as.integer(table(data[,prov.char])) # provider sizes
   prov.size.long <- rep(prov.size,prov.size) # provider sizes assigned to patients
-  data$included <- 1 * (prov.size.long > cutoff) # create variable 'included' as an indicator
-  if (message == TRUE) warning(sum(prov.size<=cutoff)," out of ",length(prov.size),
+  data$included <- 1 * (prov.size.long >= cutoff) # create variable 'included' as an indicator
+  if (message == TRUE) warning(sum(prov.size < cutoff)," out of ",length(prov.size),
           " providers considered small and filtered out!",immediate.=T,call.=F)
 
 

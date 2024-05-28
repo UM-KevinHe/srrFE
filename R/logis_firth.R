@@ -13,6 +13,8 @@
 #'
 #' @param Rcpp a Boolean indicating whether the Rcpp function is used. Defaulting to TRUE.
 #'
+#' @param threads an integer indicating the number of threads to use if "Rcpp = T". Defaulting to 1.
+#'
 #' @param AUC a Boolean indicating whether report AUC. Defaulting to FALSE.
 #'
 #' @param message a Boolean indicating whether track the fitting process. Defaulting to TRUE.
@@ -53,7 +55,7 @@
 #'
 #'
 logis_firth <- function(data.prep, max.iter = 10000, tol = 1e-5, bound = 10,
-                        backtrack = TRUE, Rcpp = TRUE, AUC = FALSE, message = FALSE){
+                        backtrack = TRUE, Rcpp = TRUE, threads = 1, AUC = FALSE, message = FALSE){
   if (missing(data.prep)) stop ("Argument 'data.prep' is required!", call.=F)
   if (!class(data.prep) %in% c("data_prep")) stop("Object 'data.prep' should be generated from 'fe_data_prep' function!", call.=F)
 
@@ -76,7 +78,7 @@ logis_firth <- function(data.prep, max.iter = 10000, tol = 1e-5, bound = 10,
 
   if (Rcpp) { #Rcpp always use "backtrack"
     ls <- logis_firth_prov(as.matrix(data[, Y.char]), Z, n.prov, gamma.prov, beta,
-                           n.obs, m, 0, 1, tol, max.iter,
+                           n.obs, m, threads = threads, tol, max.iter,
                            bound, message, backtrack)
     gamma.prov <- as.numeric(ls$gamma)
     beta <- as.numeric(ls$beta)
@@ -100,15 +102,16 @@ logis_firth <- function(data.prep, max.iter = 10000, tol = 1e-5, bound = 10,
       iter <- iter + 1
       gamma.obs <- rep(gamma.prov, n.prov)
       p <- c(plogis(gamma.obs+Z%*%beta))
-      q <- p*(1-p)
-      info.gamma.inv <- 1/sapply(split(q, data[,prov.char]),sum) #I_11^(-1)
-      info.betagamma <- sapply(by(q*Z,data[,prov.char],identity),colSums) #I_21
-      info.beta <- t(Z)%*%(q*Z) #I_22
+      pq <- p*(1-p)
+      pq[pq == 0] <- 1e-20
+      info.gamma.inv <- 1/sapply(split(pq, data[,prov.char]),sum) #I_11^(-1)
+      info.betagamma <- sapply(by(pq*Z,data[,prov.char],identity),colSums) #I_21
+      info.beta <- t(Z)%*%(pq*Z) #I_22
       mat.tmp1 <- info.gamma.inv*t(info.betagamma) #J_1^T
       schur.inv <- solve(info.beta-info.betagamma%*%mat.tmp1) #S^-1
       mat.tmp2 <- mat.tmp1%*%schur.inv #J_2^T
 
-      h <- q * (rep(info.gamma.inv + diag(mat.tmp1 %*% schur.inv %*% t(mat.tmp1)), n.prov) + #A_1 B_11 A_1^T
+      h <- pq * (rep(info.gamma.inv + diag(mat.tmp1 %*% schur.inv %*% t(mat.tmp1)), n.prov) + #A_1 B_11 A_1^T
                   2 * do.call(c, lapply(1:m, function(i) {  #A_2 B_21 A_1^T
                     as.matrix(split.Z[[i]]) %*% -t(mat.tmp2)[, i, drop = FALSE]
                   })) +
@@ -154,15 +157,9 @@ logis_firth <- function(data.prep, max.iter = 10000, tol = 1e-5, bound = 10,
   AIC <- neg2Loglkd + 2 * (length(gamma.prov)+length(beta))
   BIC <- neg2Loglkd + log(nrow(data)) * (length(gamma.prov)+length(beta))
 
-  df.prov <- data.frame(Obs_provider = sapply(split(data[,Y.char],data[,prov.char]),sum),
+  df.prov <- data.frame(Obs_provider = sapply(split(data[, Y.char], data[, prov.char]), sum),
                         gamma_est = gamma.prov) #original gamma-hat, for internal using
-  pred <- as.numeric(plogis(gamma.obs+Z%*%beta))
-
-  # modify "outlier provider" to Inf or -Inf
-  # if (sum(n.events.prov==n.prov) != 0 | sum(n.events.prov==0) != 0) {
-  #   gamma.prov[n.events.prov==n.prov] <- Inf
-  #   gamma.prov[n.events.prov==0] <- -Inf
-  # }
+  pred <- as.numeric(plogis(gamma.obs + Z %*% beta))
 
   #change output format
   beta <- matrix(beta)
